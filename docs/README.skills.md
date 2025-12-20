@@ -22,4 +22,5 @@ Skills differ from other primitives by supporting bundled assets (scripts, code 
 
 | Name | Description | Bundled Assets |
 | ---- | ----------- | -------------- |
+| [swift-localization](../skills/swift-localization/SKILL.md) | Best practices for internationalizing Swift/SwiftUI applications using LocalizedStringResource, String Catalogs (.xcstrings), and type-safe localization patterns. Use when implementing multi-language support, adding new UI strings, or refactoring hardcoded text in Swift apps. | none |
 | [webapp-testing](../skills/webapp-testing/SKILL.md) | Toolkit for interacting with and testing local web applications using Playwright. Supports verifying frontend functionality, debugging UI behavior, capturing browser screenshots, and viewing browser logs. | `test-helper.js` |
