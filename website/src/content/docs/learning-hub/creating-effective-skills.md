@@ -3,7 +3,7 @@ title: 'Creating Effective Skills'
 description: 'Master the art of writing reusable, shareable skill folders that deliver consistent results across your team.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-06-30
+lastUpdated: 2026-07-04
 estimatedReadingTime: '9 minutes'
 tags:
   - skills
@@ -412,6 +412,17 @@ A: In v1.0.66+, the agent can propose draft skill additions or improvements as i
 ```
 
 This opens a review flow where you can accept, reject, or defer each proposed change — giving you full control over how your skill library evolves. No changes are applied until you approve them.
+
+**Q: How do I control embeddings-based skill discovery?**
+
+A: In v1.0.66+, Copilot CLI persists a `dynamicRetrieval` setting that controls whether embeddings-based retrieval is used to automatically surface relevant skills. You can toggle it from the CLI with the `--dynamic-retrieval` flag:
+
+```bash
+copilot --dynamic-retrieval skills=on   # enable embeddings-based skill retrieval (default)
+copilot --dynamic-retrieval skills=off  # disable embeddings-based skill retrieval
+```
+
+When `on`, the CLI uses semantic search to find skills that match your current task — even if you don't type a slash command. When `off`, skills are only loaded when explicitly invoked via slash command or agent discovery. The setting persists across sessions, so you only need to set it once. Use `off` if you prefer full manual control over which skills are loaded, or if embeddings retrieval is adding unwanted latency in large skill libraries.
 
 ## Common Pitfalls to Avoid
 
