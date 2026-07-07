@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-06-30
+lastUpdated: 2026-07-07
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -401,7 +401,7 @@ CLI settings use **camelCase** naming. Key settings added in recent releases:
 | `extension_mode` | Control extensibility (agent tools and plugins) |
 | `continueOnAutoMode` | Automatically switch to the auto model on rate limit instead of pausing |
 | `proxy` | HTTP(S) proxy URL for all outbound CLI requests (e.g., `http://proxy.example.com:8080`) (v1.0.64+) |
-| `sessionLimits` | Restrict credit or turn usage for a session; limits apply across the current conversation and reset on `/clear` (v1.0.66+) |
+| `sessionLimits` | Restrict credit or turn usage for a session; limits apply across the current conversation and reset on `/clear`; minimum limit is 30 AI credits (v1.0.66+, min-30 v1.0.67+) |
 
 > **Note**: Older snake_case names (e.g., `include_gitignored`, `auto_updates_channel`) are still accepted for backward compatibility, but camelCase is now the preferred format.
 
@@ -515,7 +515,13 @@ In v1.0.66+, you can pass a task description to `/worktree` to name the branch f
 /worktree fix the login redirect
 ```
 
-This creates a branch named from your task description and begins working on it immediately, making it easy to spin up parallel work without stopping to think of a branch name.
+This creates a branch named from your task description and begins working on it immediately, making it easy to spin up parallel work without stopping to think of a branch name. Branch names are preserved exactly as typed — for example, `feature/JIRA-123` is kept as-is, not flattened to `feature-jira-123` *(v1.0.66+)*.
+
+With no argument, `/worktree` names the new branch automatically from your uncommitted changes and recent conversation history, using your active model *(v1.0.66+)*:
+
+```
+/worktree      # let Copilot name the branch from context
+```
 
 After the command runs, the session is inside the new worktree. Use this when you want to work on a second task in parallel without stashing changes or opening a new terminal. In v1.0.64+ you can also use the experimental `--worktree` flag at startup (`copilot -w [name]`) to create or reuse a worktree under `<repo>.worktrees/` before the session begins.
 
@@ -603,7 +609,7 @@ The `/context` command shows a visualization of the current conversation's conte
 /context
 ```
 
-The `/usage` command displays session metrics such as the number of tokens consumed, API calls made, and any quota information for the current session. In v1.0.64+, `/usage` also shows per-model token totals when you have used multiple models in a session:
+The `/usage` command displays session metrics such as the number of tokens consumed, API calls made, and any quota information for the current session. In v1.0.64+, `/usage` also shows per-model token totals when you have used multiple models in a session. In v1.0.68+, `/usage` additionally displays **plan budget details** for supported plans, giving you a clearer picture of remaining capacity:
 
 ```
 /usage
@@ -619,7 +625,7 @@ The `/compact` command summarizes the conversation history to free up context wi
 
 > **ACP sessions (v1.0.39+)**: The `/compact`, `/context`, `/usage`, and `/env` commands are now available in ACP (Agent Coordination Protocol) sessions, allowing remote ACP clients to surface session details and manage context from within their own automated workflows.
 
-The `/statusline` command (with `/footer` as an alias) lets you control which items appear in the terminal status bar. You can show or hide individual indicators like the working directory, current branch, effort level, context window usage, quota, and **active account username** (v1.0.43+). The **changes** toggle shows a running count of added/removed lines for the session — useful when tracking the scope of an ongoing edit. In v1.0.65+, there is also an opt-in **CI check status** indicator that shows the passing/running/failing state of CI checks for the current branch — enable it from the `/statusline` menu:
+The `/statusline` command (with `/footer` as an alias) lets you control which items appear in the terminal status bar. You can show or hide individual indicators like the working directory, current branch, effort level, context window usage, quota, and **active account username** (v1.0.43+). The **changes** toggle shows a running count of added/removed lines for the session — useful when tracking the scope of an ongoing edit. In v1.0.65+, there is also an opt-in **CI check status** indicator that shows the passing/running/failing state of CI checks for the current branch. In v1.0.68+, the statusline also shows **plan budget details** for supported plans so you can see your remaining capacity at a glance — enable any of these from the `/statusline` menu:
 
 ```
 /statusline             # show the statusline configuration menu

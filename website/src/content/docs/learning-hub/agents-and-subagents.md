@@ -3,7 +3,7 @@ title: 'Agents and Subagents'
 description: 'Learn how delegated subagents differ from primary agents, when to use them, and how to launch them in VS Code and Copilot CLI.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-01
+lastUpdated: 2026-07-07
 estimatedReadingTime: '9 minutes'
 tags:
   - agents
@@ -211,6 +211,14 @@ No. They can run sequentially when one step depends on another, or in parallel w
 **Can I control how many subagents run simultaneously?**
 
 Yes. In v1.0.66+, usage-based billing users can configure **subagent concurrency and depth limits** directly from `/settings`. The concurrency limit controls how many subagents run in parallel; the depth limit controls how many levels deep delegation can chain (preventing runaway recursive subagent trees). These settings give you predictable control over resource consumption during complex orchestrated tasks.
+
+**Do custom agents keep their tool restrictions when launching subagents?**
+
+Yes *(v1.0.68+)*. A custom agent's `tools` filter is inherited by any nested subagents it creates. If your agent has `tools: ['codebase', 'github']`, subagents launched by that agent are also restricted to those tools. This prevents privilege escalation through delegation chains and makes tool scope predictable regardless of nesting depth.
+
+**Can I browse and switch sessions from the agents screen?**
+
+Yes *(v1.0.68+)*. The agents screen in Copilot CLI allows you to browse all available sessions, resume a previous session, and switch between active sessions without leaving the current UI. This is especially useful when managing multiple parallel agent sessions.
 
 ## Next steps
 
