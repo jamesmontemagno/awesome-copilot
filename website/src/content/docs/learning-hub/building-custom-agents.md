@@ -3,7 +3,7 @@ title: 'Building Custom Agents'
 description: 'Learn how to create specialized GitHub Copilot agents with custom personas, tool integrations, and domain expertise.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-01
+lastUpdated: 2026-07-07
 estimatedReadingTime: '10 minutes'
 tags:
   - agents
@@ -96,6 +96,8 @@ tools: ['codebase', 'terminal', 'github']
 | `edit` | Modify files in the workspace |
 
 For MCP server tools, reference them by server name (e.g., `postgres`, `docker`). See [Understanding MCP Servers](../understanding-mcp-servers/) for details.
+
+> **Tool filter inheritance** *(v1.0.68+)*: An agent's `tools` restrictions are preserved when it launches subagents. If your agent is configured with `tools: ['codebase', 'github']`, any nested subagents it creates will be limited to the same tool set — preventing privilege escalation through delegation chains.
 
 ### Agent Instructions
 
@@ -256,7 +258,7 @@ The agent can then query your database, analyze query plans, and suggest optimiz
 |----------|-------------------|
 | Most demanding reasoning, security review | Claude Sonnet 5 *(v1.0.67+)* |
 | Complex reasoning, analysis | Claude Sonnet 4 |
-| Code generation, refactoring | GPT-4.1 |
+| Code generation, refactoring | GPT-4.1 or kimi-k2.7-code *(v1.0.68+)* |
 | Quick analysis, simple tasks | Claude Haiku or GPT-4.1-mini |
 | Large codebase understanding | Models with larger context windows |
 
