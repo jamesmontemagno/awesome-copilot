@@ -3,7 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-06-24
+lastUpdated: 2026-07-09
 estimatedReadingTime: '8 minutes'
 tags:
   - plugins
@@ -178,6 +178,19 @@ Or from an interactive session:
 
 > **Deprecation notice**: Installing plugins directly from a GitHub repository URL, raw URL, or local file path (e.g., `copilot plugin install github/awesome-copilot`) is deprecated and will be removed in a future release. Use marketplace-based installation instead.
 
+### Pinning a Plugin to an Exact Commit SHA
+
+To lock a plugin to a specific version for reproducible environments, add a `sha` field to the plugin source configuration *(v1.0.70+)*. This prevents the plugin from updating to a newer commit and is useful for CI pipelines or shared team environments where version stability matters:
+
+```json
+{
+ "source": "awesome-copilot",
+ "sha": "a1b2c3d4e5f6789abcdef0123456789abcdef01"
+}
+```
+
+Once pinned, running `copilot plugin update` will not advance the plugin beyond the specified SHA. Remove the `sha` field to allow updates again.
+
 ### From VS Code
 
 Browse to the plugin via `@agentPlugins` in the Extensions search view or via **Chat: Plugins** in the Command Palette, then click **Install**.
@@ -199,6 +212,16 @@ copilot plugin marketplace update
 # Remove a plugin
 copilot plugin uninstall my-plugin
 ```
+
+### Interactive Plugin Dashboard
+
+The `/plugins` command *(v1.0.69+)* opens an interactive dashboard inside a running session for managing installed plugins without leaving the CLI:
+
+```
+/plugins
+```
+
+The dashboard shows all installed plugins with their status and lets you enable, disable, and inspect plugins on the fly. Unlike the command-line `plugin` subcommands (which require a separate terminal invocation), `/plugins` works **while the agent is working** — you can check your plugin status or toggle a plugin mid-session without interrupting the current task.
 
 ### Loading Plugins from a Local Directory
 

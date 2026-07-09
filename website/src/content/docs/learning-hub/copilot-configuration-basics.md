@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-07
+lastUpdated: 2026-07-09
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -278,6 +278,34 @@ When writing TypeScript code:
 
 **When to use**: For project-wide coding standards, architectural patterns, or technology-specific conventions that should influence all suggestions.
 
+### Repository Model and Effort Pinning (v1.0.70+)
+
+A trusted repository can enforce a consistent AI model, reasoning effort level, and context tier for all sessions working in that repository by adding a `.github/copilot/settings.json` file. It can also extend the URL, MCP, and skill deny lists to enforce security policies.
+
+```json
+// .github/copilot/settings.json
+{
+  "model": "claude-sonnet-4.6",
+  "effortLevel": "high",
+  "contextTier": "long_context",
+  "denyLists": {
+    "urls": ["internal-secrets.example.com"],
+    "mcpServers": ["untrusted-server"],
+    "skills": ["disallowed-skill"]
+  }
+}
+```
+
+**Available fields**:
+- `model` — Pin to a specific model (e.g., `"claude-sonnet-4.6"` or a family alias like `"sonnet"`)
+- `effortLevel` — Set the default reasoning effort (`"low"`, `"medium"`, `"high"`)
+- `contextTier` — Set the default context window size (`"default"` or `"long_context"`)
+- `denyLists` — Extend the URL, MCP server, and skill deny lists to block specific resources
+
+> **Security note**: Repository settings in `.github/copilot/settings.json` apply only when the repository is **trusted** by the user. This prevents malicious repositories from changing your AI model or blocking legitimate tools without your knowledge.
+
+**When to use**: For team environments where consistent, reproducible AI behaviour matters — CI pipelines, shared development environments, or security-sensitive projects where you want to ensure all contributors use the same model and effort settings.
+
 ## Setting Up Team Configuration
 
 Follow these steps to establish effective team-wide Copilot configuration:
@@ -403,6 +431,7 @@ CLI settings use **camelCase** naming. Key settings added in recent releases:
 | `proxy` | HTTP(S) proxy URL for all outbound CLI requests (e.g., `http://proxy.example.com:8080`) (v1.0.64+) |
 | `sessionLimits` | Restrict credit or turn usage for a session; limits apply across the current conversation and reset on `/clear` (v1.0.66+) |
 | `stayInAutopilot` | Keep the CLI in autopilot mode after an autopilot task completes, instead of returning to interactive mode (v1.0.69+) |
+| `showTimestamps` | Show or hide timestamps in the conversation timeline (v1.0.70+) |
 
 > **Note**: Older snake_case names (e.g., `include_gitignored`, `auto_updates_channel`) are still accepted for backward compatibility, but camelCase is now the preferred format.
 
@@ -425,13 +454,23 @@ The model picker opens in a **full-screen view** with inline reasoning effort ad
 
 ### CLI Session Commands
 
-The `/settings` command (v1.0.61+) opens an interactive dialog to browse and edit all user settings in one place. Use it to discover available settings, toggle options, and update values without manually editing your config file:
+The `/settings` command (v1.0.61+) opens an interactive dialog to browse and edit all user settings in one place. Use it to discover available settings, toggle options, and update values without manually editing your config file. The `--repo` flag opens the repository-level settings view, and `--local` opens the local (per-project) settings view *(v1.0.70+)*:
 
 ```
-/settings
+/settings           # open user settings dialog
+/settings --repo    # open repository-level settings
+/settings --local   # open local project settings
 ```
 
 The settings dialog supports search — type to filter settings by name. Changes take effect immediately.
+
+The `/model` command supports the same `--repo` and `--local` flags *(v1.0.70+)* to view or set the model at the repository or local project level:
+
+```
+/model              # open model picker for current session
+/model --repo       # set model at repository level
+/model --local      # set model for the local project
+```
 
 GitHub Copilot CLI has two commands for managing session state, with distinct behaviours:
 
@@ -578,6 +617,14 @@ The `/diagnose` command (v1.0.64+) analyzes the current session's logs and surfa
 
 Use `/diagnose` when a session is behaving unexpectedly — it inspects session logs and reports what it finds, making it easier to share diagnostics with support or understand what happened internally.
 
+The `/refine` command *(v1.0.70+)* rewrites a rough, stream-of-consciousness prompt into a clearer, more focused one. Use it when you have an idea you want to clean up before sending:
+
+```
+/refine
+```
+
+After running `/refine`, the original prompt is replaced with a refined version you can review, adjust, and send. This is useful when you want to communicate a complex goal but are struggling to phrase it precisely — let the model sharpen the prompt for you before acting on it.
+
 **Keyboard shortcuts for queuing messages**: Use **Ctrl+Q** or **Ctrl+Enter** to queue a message (send it while the agent is still working). **Ctrl+D** no longer queues messages — it now has its default terminal behavior. If you have muscle memory for Ctrl+D queuing, switch to Ctrl+Q.
 
 **Background running tasks**: Press **Ctrl+X → B** to move the current running task or shell command to the background. The task continues executing while you can type a new message or review earlier output. This is useful for long-running commands where you want to interact with the agent while waiting for the result.
@@ -719,6 +766,16 @@ copilot --config-dir ~/.my-copilot-config
 ```
 
 Set `COPILOT_HOME` in your shell profile to use a custom config directory across all sessions. This is especially useful when running multiple Copilot configurations for different projects or teams.
+
+The `--sandbox` and `--no-sandbox` flags *(v1.0.70+)* toggle the OS-level shell sandbox on or off for the current session only, without changing your saved sandbox setting. This is useful when you need to override the default for a single session — for example, to run a test suite that the sandbox would otherwise block:
+
+```bash
+copilot --sandbox        # enable sandbox for this session only
+copilot --no-sandbox     # disable sandbox for this session only
+copilot --no-sandbox -p "Run the full test suite"  # combine with prompt mode
+```
+
+Unlike editing the sandbox setting in `/settings`, these flags affect only the current session. Your default sandbox preference is preserved for future sessions.
 
 ### Shell Completion
 
