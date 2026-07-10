@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-07
+lastUpdated: 2026-07-10
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -423,6 +423,19 @@ The model picker opens in a **full-screen view** with inline reasoning effort ad
 
 **Model family aliases** (v1.0.64+): Instead of typing a full model name, you can use short family aliases in the model setting: `opus`, `sonnet`, `haiku` (Anthropic), and `gpt`, `gemini` (Google/OpenAI). The CLI resolves the alias to the latest available model in that family. This is especially useful in scripts or configuration files where you want to track the best model in a family without hardcoding a version string.
 
+**Repository-pinned model and effort settings** (v1.0.70+): A trusted repository can pin the model, reasoning effort level, and context tier for all collaborators via `.github/copilot/settings.json`. It can also extend the URL, MCP, and skill deny lists to enforce security policies across the team:
+
+```json
+// .github/copilot/settings.json
+{
+  "model": "claude-sonnet-4.6",
+  "effortLevel": "high",
+  "contextTier": "long_context"
+}
+```
+
+When this file is present in a trusted repository, the CLI applies these settings for sessions in that repository. This ensures the whole team uses consistent model configuration without relying on individual developer settings — useful for regulated environments or cost-controlled deployments.
+
 ### CLI Session Commands
 
 The `/settings` command (v1.0.61+) opens an interactive dialog to browse and edit all user settings in one place. Use it to discover available settings, toggle options, and update values without manually editing your config file:
@@ -432,6 +445,21 @@ The `/settings` command (v1.0.61+) opens an interactive dialog to browse and edi
 ```
 
 The settings dialog supports search — type to filter settings by name. Changes take effect immediately.
+
+The `/refine` command (v1.0.70+) rewrites a rough, stream-of-consciousness prompt into a clear, structured one before submitting it to the agent. Use it when you have a vague idea of what you want but aren't sure how to phrase it:
+
+```
+/refine
+```
+
+Type your rough idea, and the CLI will produce a polished prompt that you can review, edit, and submit. This is especially useful for complex multi-step requests where precision matters.
+
+The `--sandbox` and `--no-sandbox` flags (v1.0.70+) let you toggle the OS-level shell sandbox on or off **for the current session only**, without changing your saved sandbox setting. This is useful in combination with `-p` (one-shot prompt mode) for scripted or trusted environments:
+
+```bash
+copilot --sandbox      # force sandbox on for this session
+copilot --no-sandbox   # turn sandbox off for this session only
+```
 
 GitHub Copilot CLI has two commands for managing session state, with distinct behaviours:
 
