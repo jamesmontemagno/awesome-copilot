@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-07
+lastUpdated: 2026-07-11
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -278,6 +278,34 @@ When writing TypeScript code:
 
 **When to use**: For project-wide coding standards, architectural patterns, or technology-specific conventions that should influence all suggestions.
 
+### Repository Model and Effort Pinning (v1.0.70+)
+
+Trusted repositories can pin the model, reasoning effort level, and context tier for all sessions opened in that repository via `.github/copilot/settings.json`. This ensures everyone on your team uses the same AI configuration without needing to configure it individually.
+
+```json
+// .github/copilot/settings.json
+{
+  "model": "claude-sonnet-4.6",
+  "reasoningEffort": "high",
+  "contextTier": "long_context"
+}
+```
+
+The file also lets you extend the URL, MCP server, and skill deny lists to enforce organization-specific security policies:
+
+```json
+{
+  "model": "gpt-5.6",
+  "denyLists": {
+    "urls": ["*.internal-secrets.com"],
+    "mcpServers": ["untrusted-server"],
+    "skills": ["blocked-skill"]
+  }
+}
+```
+
+> **Note**: This file is only respected from **trusted repositories**. If the repository hasn't been trusted in the CLI, these settings are ignored. This prevents malicious repositories from hijacking your model selection or imposing restrictive deny lists.
+
 ## Setting Up Team Configuration
 
 Follow these steps to establish effective team-wide Copilot configuration:
@@ -422,6 +450,8 @@ The model picker opens in a **full-screen view** with inline reasoning effort ad
 **Auto mode and server-side model routing** (v1.0.43+): When you select **Auto** as your model, the CLI uses server-side model routing for real-time model selection. Instead of locking in a single model at session start, Auto mode evaluates each request and routes it to the most appropriate model dynamically. This means straightforward questions can be handled by a faster model while complex reasoning tasks are automatically escalated — without you needing to switch models manually.
 
 **Model family aliases** (v1.0.64+): Instead of typing a full model name, you can use short family aliases in the model setting: `opus`, `sonnet`, `haiku` (Anthropic), and `gpt`, `gemini` (Google/OpenAI). The CLI resolves the alias to the latest available model in that family. This is especially useful in scripts or configuration files where you want to track the best model in a family without hardcoding a version string.
+
+**Recent model additions**: `gpt-5.6` (v1.0.70), `claude-sonnet-5` (v1.0.67), `kimi-k2.7-code` (v1.0.68), and `claude-opus-4.8-fast` (v1.0.66, replacing `claude-opus-4.6-fast`) are now available in the model picker.
 
 ### CLI Session Commands
 
