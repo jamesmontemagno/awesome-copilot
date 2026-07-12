@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-07
+lastUpdated: 2026-07-12
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -413,6 +413,33 @@ In addition to the main config file, GitHub Copilot CLI reads two optional per-p
 
 These files follow the same format as `config.json` and are loaded after the global config, so they can tailor CLI behaviour—including hook definitions—per repository without touching `.github/`.
 
+#### Repository-Pinned Settings via `.github/copilot/settings.json` *(v1.0.70+)*
+
+A **trusted repository** can also pin settings for all users who work in it by committing a `.github/copilot/settings.json` file. This file is loaded for all users who have trusted the repository and lets you lock in a consistent experience for CI, onboarding, and regulated environments without requiring each developer to configure their own CLI.
+
+The following settings can be configured:
+
+| Setting | Description |
+|---------|-------------|
+| `model` | Pin the default model for this repository (e.g., `"claude-sonnet-4"`) |
+| `effortLevel` | Pin the reasoning effort level (`"low"`, `"medium"`, or `"high"`) |
+| `contextTier` | Pin the context tier for the session |
+| `urlDenyList` | Extend the URL allowlist with additional blocked patterns |
+| `mcpDenyList` | Extend the MCP server deny list for this repository |
+| `skillDenyList` | Extend the skill deny list for this repository |
+
+Example:
+
+```json
+{
+  "model": "claude-sonnet-4",
+  "effortLevel": "high",
+  "urlDenyList": ["https://internal-only.example.com"]
+}
+```
+
+> **Security**: Repository-pinned settings only apply when the repository is trusted. This prevents untrusted repositories from silently overriding your model or effort preferences.
+
 > **Important (v1.0.36+)**: Custom agents, skills, and commands placed in `~/.claude/` (the Claude Code user directory) are **no longer loaded** by GitHub Copilot CLI. Only `~/.claude/settings.json` is read for configuration. If you previously stored personal agents or skills in `~/.claude/`, move them to the supported locations: `~/.copilot/agents/` for user-level agents, `~/.copilot/skills/` or `~/.agents/skills/` for personal skills, or `.github/agents/` and `.github/skills/` in your repositories for project-level customizations.
 
 ### Model Picker
@@ -432,6 +459,29 @@ The `/settings` command (v1.0.61+) opens an interactive dialog to browse and edi
 ```
 
 The settings dialog supports search — type to filter settings by name. Changes take effect immediately.
+
+**Scoped settings and model selection** *(v1.0.70+)*: Use `--repo` and `--local` flags with `/settings` and `/model` to apply changes at a specific scope — `--repo` saves the setting to `.github/copilot/settings.json` (shared with the team), while `--local` saves it as a personal override that takes precedence over the repository setting:
+
+```
+/settings --repo          # edit repository-scoped settings
+/settings --local         # edit local user overrides
+/model --repo gpt-5.6     # pin the model for everyone in this repository
+```
+
+**`/refine` command** *(v1.0.70+)*: Use `/refine` to automatically rewrite a rough, stream-of-consciousness prompt into a clear, well-structured one before submitting it. This is especially useful when you have an idea but aren't sure how to express it precisely:
+
+```
+/refine
+```
+
+Copilot will suggest a rewritten version of your last prompt. You can accept it, edit it further, or discard it.
+
+**Session sandbox flags** *(v1.0.70+)*: Use `--sandbox` and `--no-sandbox` to toggle the OS-level shell sandbox for the current session only, without permanently changing your saved sandbox setting. This is useful with `-p` (prompt mode) when you need different sandbox behavior for a specific invocation:
+
+```bash
+copilot --no-sandbox -p "..."   # run this prompt without the sandbox
+copilot --sandbox -p "..."      # force sandbox on for this prompt
+```
 
 GitHub Copilot CLI has two commands for managing session state, with distinct behaviours:
 
