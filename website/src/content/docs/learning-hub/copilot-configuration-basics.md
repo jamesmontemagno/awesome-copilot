@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-07
+lastUpdated: 2026-07-13
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -413,6 +413,23 @@ In addition to the main config file, GitHub Copilot CLI reads two optional per-p
 
 These files follow the same format as `config.json` and are loaded after the global config, so they can tailor CLI behaviour—including hook definitions—per repository without touching `.github/`.
 
+**Repository-pinned settings via `.github/copilot/settings.json`** (v1.0.70+): When a repository is **trusted**, Copilot CLI also reads `.github/copilot/settings.json` from the repository root. This file lets repository owners pin the default **model**, **reasoning effort level**, and **context tier** for everyone working in that repository, and extend the URL, MCP, and skill deny lists with repository-specific rules. Because these settings are checked into version control, they provide a consistent, auditable baseline for all contributors — useful for teams that want to standardize on a specific model or enforce guardrails at the repository level:
+
+```json
+{
+  "model": "claude-sonnet-4.6",
+  "effortLevel": "high",
+  "contextTier": "long_context",
+  "denyList": {
+    "urls": ["internal.corp.example.com"],
+    "mcpServers": ["untrusted-server"],
+    "skills": ["experimental-skill"]
+  }
+}
+```
+
+> **Note**: Settings in `.github/copilot/settings.json` are only applied when the repository folder is trusted. Untrusted repositories cannot change your model, effort, or deny lists.
+
 > **Important (v1.0.36+)**: Custom agents, skills, and commands placed in `~/.claude/` (the Claude Code user directory) are **no longer loaded** by GitHub Copilot CLI. Only `~/.claude/settings.json` is read for configuration. If you previously stored personal agents or skills in `~/.claude/`, move them to the supported locations: `~/.copilot/agents/` for user-level agents, `~/.copilot/skills/` or `~/.agents/skills/` for personal skills, or `.github/agents/` and `.github/skills/` in your repositories for project-level customizations.
 
 ### Model Picker
@@ -591,6 +608,14 @@ The `/ask` command lets you ask a quick question without affecting your conversa
 ```
 /ask What does the `retry` utility in src/utils do?
 ```
+
+The `/refine` command (v1.0.70+) rewrites a rough, stream-of-consciousness prompt into a clear, well-structured one. Use it when you have a vague idea but want to send a more precise prompt to the agent:
+
+```
+/refine
+```
+
+After typing `/refine`, enter your rough prompt. The CLI uses the model to rewrite it into a cleaner version that you can review, edit, and then send. This is especially helpful when you know what you want but struggle to articulate it precisely.
 
 The `/env` command shows all loaded environment details — instructions, MCP servers, skills, agents, and plugins — in a single view. Use it to verify that the right resources are active for the current session:
 
