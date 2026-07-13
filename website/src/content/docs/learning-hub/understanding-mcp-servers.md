@@ -3,7 +3,7 @@ title: 'Understanding MCP Servers'
 description: 'Learn how Model Context Protocol servers extend GitHub Copilot with access to external tools, databases, and APIs.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-06
+lastUpdated: 2026-07-13
 estimatedReadingTime: '8 minutes'
 tags:
   - mcp
@@ -300,6 +300,8 @@ For example, a PostgreSQL server that can't connect because `DATABASE_URL` is no
 ```
 /mcp list              # show servers attached to this session
 ```
+
+In v1.0.70+, locally-spawned MCP servers that run inside the OS-level sandbox are marked with a **`(sandboxed)`** badge in `/mcp list` — for example, `connected (sandboxed)`. This makes it easy to verify at a glance which servers are running in a sandboxed environment.
 
 You can also open the `/mcp` manager while the agent is working to toggle servers on or off mid-turn. Add, edit, delete, and re-auth actions wait until the turn finishes, but enabling or disabling a server takes effect immediately.
 
