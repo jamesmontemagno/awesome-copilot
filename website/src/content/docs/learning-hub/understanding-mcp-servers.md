@@ -3,7 +3,7 @@ title: 'Understanding MCP Servers'
 description: 'Learn how Model Context Protocol servers extend GitHub Copilot with access to external tools, databases, and APIs.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-06
+lastUpdated: 2026-07-14
 estimatedReadingTime: '8 minutes'
 tags:
   - mcp
@@ -146,6 +146,8 @@ The available RPCs are:
 | `mcp.config.remove` | Remove a server from the persistent configuration |
 
 These are especially useful for plugins and installer scripts that need to self-register or de-register their MCP server as part of install/uninstall flows, without requiring the user to manually edit config files.
+
+*(v1.0.70+)* The CLI also exposes **SDK APIs** to manage live MCP servers in **running sessions** — not just persistent config. This allows tooling and extensions to dynamically add, remove, or inspect active MCP servers without restarting a session. The `session.mcp.resources` APIs support paginated `read`, `list`, and `listTemplates` operations for accessing MCP server resources programmatically.
 
 ### Common MCP Server Configurations
 
@@ -300,6 +302,8 @@ For example, a PostgreSQL server that can't connect because `DATABASE_URL` is no
 ```
 /mcp list              # show servers attached to this session
 ```
+
+*(v1.0.70+)* Locally-spawned MCP servers that run **inside the OS-level shell sandbox** are now marked distinctly in `/mcp list` with a `(sandboxed)` label (e.g., `connected (sandboxed)`). This makes it easy to see at a glance which servers have restricted filesystem and network access compared to unsandboxed servers.
 
 You can also open the `/mcp` manager while the agent is working to toggle servers on or off mid-turn. Add, edit, delete, and re-auth actions wait until the turn finishes, but enabling or disabling a server takes effect immediately.
 
