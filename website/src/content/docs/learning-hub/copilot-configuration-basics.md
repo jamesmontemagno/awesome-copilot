@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-07
+lastUpdated: 2026-07-15
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -412,6 +412,36 @@ In addition to the main config file, GitHub Copilot CLI reads two optional per-p
 - `.claude/settings.local.json` — local overrides (add to `.gitignore` for personal adjustments)
 
 These files follow the same format as `config.json` and are loaded after the global config, so they can tailor CLI behaviour—including hook definitions—per repository without touching `.github/`.
+
+### Repository-Level CLI Settings via .github/copilot/settings.json (v1.0.70+)
+
+Trusted repositories can pin CLI behaviour for everyone who works in that repository by committing a `.github/copilot/settings.json` file. This lets a repository enforce a consistent model, reasoning effort level, and context tier, and extend the URL, MCP server, and skill deny lists, without requiring individual developers to adjust their personal config:
+
+```json
+{
+  "model": "claude-sonnet-4.6",
+  "effortLevel": "high",
+  "contextTier": "long_context",
+  "denyList": {
+    "urls": ["http://internal-only.example.com"],
+    "mcpServers": ["untrusted-server"],
+    "skills": ["deprecated-skill"]
+  }
+}
+```
+
+Supported fields:
+
+| Field | Description |
+|-------|-------------|
+| `model` | Pin the active model for all sessions in this repository |
+| `effortLevel` | Pin the reasoning effort level (`low`, `medium`, `high`) |
+| `contextTier` | Pin the context tier (`default`, `long_context`) |
+| `denyList.urls` | Additional URLs blocked by the sandbox in this repository |
+| `denyList.mcpServers` | Additional MCP servers blocked in this repository |
+| `denyList.skills` | Additional skills blocked in this repository |
+
+> **Security note**: `.github/copilot/settings.json` is only applied when the repository is added to your trusted repository list. Cloning an untrusted repository does not automatically apply its CLI settings.
 
 > **Important (v1.0.36+)**: Custom agents, skills, and commands placed in `~/.claude/` (the Claude Code user directory) are **no longer loaded** by GitHub Copilot CLI. Only `~/.claude/settings.json` is read for configuration. If you previously stored personal agents or skills in `~/.claude/`, move them to the supported locations: `~/.copilot/agents/` for user-level agents, `~/.copilot/skills/` or `~/.agents/skills/` for personal skills, or `.github/agents/` and `.github/skills/` in your repositories for project-level customizations.
 
