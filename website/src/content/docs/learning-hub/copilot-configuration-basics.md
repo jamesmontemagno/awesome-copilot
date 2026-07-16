@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-07
+lastUpdated: 2026-07-16
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -405,6 +405,29 @@ CLI settings use **camelCase** naming. Key settings added in recent releases:
 | `stayInAutopilot` | Keep the CLI in autopilot mode after an autopilot task completes, instead of returning to interactive mode (v1.0.69+) |
 
 > **Note**: Older snake_case names (e.g., `include_gitignored`, `auto_updates_channel`) are still accepted for backward compatibility, but camelCase is now the preferred format.
+
+### Trusted Repository Settings (v1.0.70+)
+
+A trusted repository can pin the model, reasoning effort level, and context tier for all sessions working in that repository, and extend the URL, MCP server, and skill deny lists. These settings live in `.github/copilot/settings.json` in the repository root:
+
+```json
+{
+  "model": "claude-sonnet-4.6",
+  "effortLevel": "high",
+  "contextTier": "long_context",
+  "denyUrls": ["*.internal-only.example.com"],
+  "denyMcpServers": ["untrusted-server"],
+  "denySkills": ["experimental-skill"]
+}
+```
+
+This is especially useful for:
+
+- **Governance** — Enforce a specific model or effort level across all developers in a repository, ensuring consistent behavior for sensitive workloads
+- **Security** — Extend the deny lists to block access to internal URLs or unapproved MCP servers
+- **Predictability** — Pin the context tier to prevent inadvertent cost surprises on large codebases
+
+Repository trust is confirmed when you explicitly trust the folder in the CLI. Untrusted repositories cannot apply these settings.
 
 In addition to the main config file, GitHub Copilot CLI reads two optional per-project files for repository-specific overrides:
 

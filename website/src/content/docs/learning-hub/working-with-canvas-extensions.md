@@ -3,7 +3,7 @@ title: 'Working with Canvas Extensions'
 description: 'Create and iterate on GitHub Copilot app canvases using /create-canvas, then shape them into reusable project or personal extensions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-06-17
+lastUpdated: 2026-07-16
 estimatedReadingTime: '8 minutes'
 tags:
   - copilot-app
@@ -122,7 +122,36 @@ Use these extension folders as concrete references:
 
 These examples show different complexity levels, from focused workflow boards to richer UI + automation integrations.
 
-## Iterating after first creation
+## Using Canvas Extensions in Copilot CLI (v1.0.71+)
+
+Canvas support is now available in GitHub Copilot CLI, in addition to the GitHub Copilot app. When a session loads a canvas extension, the CLI renders an interactive panel alongside the conversation — the same bidirectional surface that makes canvases useful in the app is now accessible from your terminal workflow.
+
+### How it works in the CLI
+
+Canvas extensions loaded via the plugin system or from a local `extensions/` directory are automatically detected. The CLI opens the canvas panel when the agent activates the extension:
+
+```bash
+# Start a session with a plugin that includes a canvas extension
+copilot --plugin-dir ./my-canvas-plugin
+
+# Or install from a marketplace plugin
+copilot plugin install backlog-triage@awesome-copilot
+```
+
+Once loaded, you interact with the canvas through the CLI's panel UI, and the agent can call canvas capabilities to update the shared state — just as it does in the app.
+
+### When to use the CLI vs the app
+
+| Scenario | Recommended client |
+|----------|--------------------|
+| Terminal-first workflows, SSH, CI | **Copilot CLI** |
+| Rich visual canvases with complex UI | **Copilot app** |
+| Creating new canvases with `/create-canvas` | **Copilot app** |
+| Running existing canvas extensions in scripts | **Copilot CLI** |
+
+You can develop a canvas extension in the app using `/create-canvas`, then load and run it in the CLI for automated or headless workflows.
+
+
 
 Treat the first `/create-canvas` result as version one. Then refine in-place:
 
