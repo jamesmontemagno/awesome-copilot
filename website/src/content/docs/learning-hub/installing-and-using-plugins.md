@@ -3,7 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-06-24
+lastUpdated: 2026-07-16
 estimatedReadingTime: '8 minutes'
 tags:
   - plugins
@@ -160,6 +160,28 @@ To automatically register an additional marketplace for everyone working in a re
 
 With this in place, team members automatically get the `my-org-plugins` marketplace available without running a separate `marketplace add` command. This replaces the older `marketplaces` setting, which was removed in v1.0.16.
 
+### Pinning Plugins to an Exact Commit
+
+For reproducible environments where you need a specific version of a plugin, you can pin a plugin's source to an exact commit SHA (v1.0.70+). Add a `sha` field to the plugin source configuration:
+
+```json
+{
+  "extraKnownMarketplaces": [
+    {
+      "name": "my-org-plugins",
+      "source": "my-org/internal-plugins",
+      "sha": "abc1234def5678..."
+    }
+  ]
+}
+```
+
+With `sha` set, the plugin installer fetches exactly that commit rather than the latest version. This is especially useful for:
+
+- **Team consistency** — Ensuring everyone on the team uses identical plugin versions
+- **Security auditing** — Locking plugins to a reviewed commit before deployment
+- **Staged rollouts** — Controlling when teams receive plugin updates
+
 ## Installing Plugins
 
 ### From Copilot CLI
@@ -199,6 +221,16 @@ copilot plugin marketplace update
 # Remove a plugin
 copilot plugin uninstall my-plugin
 ```
+
+### Plugins Dashboard
+
+For an interactive, in-session overview of your installed plugins, use the `/plugins` dashboard (v1.0.69+):
+
+```
+/plugins
+```
+
+The dashboard shows all installed plugins, their versions, and their status. You can browse, enable, and disable individual plugins directly from the dashboard without leaving your session.
 
 ### Loading Plugins from a Local Directory
 
