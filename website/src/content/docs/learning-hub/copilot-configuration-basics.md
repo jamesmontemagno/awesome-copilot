@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
+lastUpdated: 2026-07-19
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -541,13 +541,21 @@ The `/cd` command changes the working directory for the current session. Since v
 
 This is useful when you have multiple backgrounded sessions each focused on a different project directory.
 
-The `/worktree` command (v1.0.61+, also aliased `/move`) creates a new git worktree and switches into it, moving any uncommitted changes along. This lets you start working on a parallel branch without leaving your current terminal session:
+The `/worktree` command (v1.0.61+) creates a new git worktree and switches into it. In **v1.0.71+**, `/worktree` leaves your uncommitted changes behind in the current worktree — useful when you want to start a fresh parallel track without carrying over in-progress work:
 
 ```
 /worktree my-feature-branch
 ```
 
-In v1.0.66+, you can pass a task description to `/worktree` to name the branch from the task and immediately run the task as the first prompt in the new worktree — all in one step:
+The companion `/move` command (v1.0.71+) also creates a new git worktree and switches into it, but **carries your uncommitted changes** into the new worktree. Use `/move` when you want to continue the work you've already started on a new branch:
+
+```
+/move my-feature-branch
+```
+
+> **Before v1.0.71**, `/move` was simply an alias for `/worktree` (both moved uncommitted changes). As of v1.0.71, the two commands have distinct behaviors — choose `/worktree` for a clean start or `/move` to bring your in-progress changes.
+
+In v1.0.66+, you can pass a task description to `/worktree` (or `/move`) to name the branch from the task and immediately run the task as the first prompt in the new worktree — all in one step:
 
 ```
 /worktree fix the login redirect
@@ -555,7 +563,7 @@ In v1.0.66+, you can pass a task description to `/worktree` to name the branch f
 
 This creates a branch named from your task description and begins working on it immediately, making it easy to spin up parallel work without stopping to think of a branch name.
 
-After the command runs, the session is inside the new worktree. Use this when you want to work on a second task in parallel without stashing changes or opening a new terminal. In v1.0.64+ you can also use the experimental `--worktree` flag at startup (`copilot -w [name]`) to create or reuse a worktree under `<repo>.worktrees/` before the session begins.
+After the command runs, the session is inside the new worktree. Use this when you want to work on a second task in parallel without opening a new terminal. In v1.0.64+ you can also use the experimental `--worktree` flag at startup (`copilot -w [name]`) to create or reuse a worktree under `<repo>.worktrees/` before the session begins.
 
 The `/every` command (also available as `/loop` since v1.0.64) schedules a recurring prompt to run automatically at a specified interval. The companion `/after` command runs a prompt once after a specified delay. Both are useful for self-paced automation — polling for results, periodically summarizing progress, or triggering other slash commands on a timer:
 
