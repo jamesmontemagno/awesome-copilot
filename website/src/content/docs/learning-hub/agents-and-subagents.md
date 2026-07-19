@@ -3,7 +3,7 @@ title: 'Agents and Subagents'
 description: 'Learn how delegated subagents differ from primary agents, when to use them, and how to launch them in VS Code and Copilot CLI.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-01
+lastUpdated: 2026-07-19
 estimatedReadingTime: '9 minutes'
 tags:
   - agents
@@ -211,6 +211,8 @@ No. They can run sequentially when one step depends on another, or in parallel w
 **Can I control how many subagents run simultaneously?**
 
 Yes. In v1.0.66+, usage-based billing users can configure **subagent concurrency and depth limits** directly from `/settings`. The concurrency limit controls how many subagents run in parallel; the depth limit controls how many levels deep delegation can chain (preventing runaway recursive subagent trees). These settings give you predictable control over resource consumption during complex orchestrated tasks.
+
+In **v1.0.71**, the default maximum nesting depth was lowered from 6 to 4 to further curb runaway recursive delegation. Usage-based billing users can still raise `subagents.maxDepth` (up to 128) in `/settings` if their workflows genuinely need deeper chains.
 
 ## Next steps
 
