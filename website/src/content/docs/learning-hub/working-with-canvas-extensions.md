@@ -3,7 +3,7 @@ title: 'Working with Canvas Extensions'
 description: 'Create and iterate on GitHub Copilot app canvases using /create-canvas, then shape them into reusable project or personal extensions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-06-17
+lastUpdated: 2026-07-20
 estimatedReadingTime: '8 minutes'
 tags:
   - copilot-app
@@ -14,13 +14,35 @@ relatedArticles:
   - ./agents-and-subagents.md
   - ./using-copilot-coding-agent.md
 prerequisites:
-  - Access to the GitHub Copilot app
+  - Access to the GitHub Copilot app or GitHub Copilot CLI (v1.0.71+)
   - Basic familiarity with GitHub Copilot agent sessions
 ---
 
 Canvas extensions give you shared, interactive work surfaces inside the GitHub Copilot app. Instead of keeping all progress in chat, you can move work into a visible artifact (such as a board, document, checklist, or browser-oriented surface) that both people and agents can update.
 
 This guide explains what canvases can do, how to create one with `/create-canvas`, and how to use patterns from this repository as reference implementations.
+
+## Using Canvas Extensions in Copilot CLI (v1.0.71+)
+
+Canvas extensions are no longer limited to the GitHub Copilot app. Starting with **v1.0.71**, you can use canvas extensions directly in **GitHub Copilot CLI** as well.
+
+When you install a plugin that includes a canvas extension, or load one via `--plugin-dir`, the extension is available in your CLI session. Canvases render in the right panel (when the CLI is running in a supported terminal that handles the canvas protocol), or the agent can interact with the canvas programmatically via its callable capabilities.
+
+This means canvas workflows you build for the Copilot app can also be invoked from CLI sessions — for example, a release coordination canvas or an issue triage board — without switching to the desktop app.
+
+To enable a canvas extension in the CLI, install the plugin containing it:
+
+```bash
+copilot plugin install my-canvas-plugin@awesome-copilot
+```
+
+Or load from a local directory during development:
+
+```bash
+copilot --plugin-dir /path/to/my-extension
+```
+
+The canvas extension's capabilities are available to the agent immediately. If the extension defines an `extension.mjs` entry point with `joinSession`/`createCanvas` handlers, those capabilities are wired up automatically.
 
 ## What canvases can do
 
