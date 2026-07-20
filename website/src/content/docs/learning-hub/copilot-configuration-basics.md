@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
+lastUpdated: 2026-07-20
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -388,6 +388,25 @@ Settings file: `.vscode/settings.json` or global user settings
 }
 ```
 
+#### VS Code Agent Host (v1.129+)
+
+VS Code 1.129 introduces a **dedicated agent host** — a separate process that runs Copilot, Claude, and Codex agent sessions independently of the main editor window. This enables more stable, long-running agent sessions with a new editor panel for reviewing file diffs inline within the Agents window.
+
+Key new VS Code 1.129 capabilities:
+
+- **`!` terminal prefix in chat**: Type `!` at the start of a chat message to execute it as a terminal command directly from chat (e.g., `! npm test`)
+- **BYOK model support**: Use Bring Your Own Key (BYOK) models with the Copilot agent harness in the agent host
+- **GitHub Enterprise authentication**: Agent host sessions can authenticate against GitHub Enterprise instances
+- **Prompt files → skills migration**: Prompt files (`*.prompt.md`) are only supported in the Local agent harness. For cross-harness compatibility, migrate prompt files to skills using the `chat.customizations.promptMigration.enabled` setting
+
+Relevant settings:
+
+| Setting | Description |
+|---------|-------------|
+| `chat.agentHost.enabled` | Enable the dedicated agent host |
+| `chat.customizations.promptMigration.enabled` | Enable prompt-to-skill migration tooling |
+| `workbench.experimental.modernUI` | Opt in to the experimental modern UI preview |
+
 ### Visual Studio
 
 Settings: Tools → Options → GitHub Copilot
@@ -459,6 +478,14 @@ The `/settings` command (v1.0.61+) opens an interactive dialog to browse and edi
 
 The settings dialog supports search — type to filter settings by name. Changes take effect immediately.
 
+*(v1.0.72+)* Enable a **`$` shell shortcut** to open an interactive terminal directly from the Copilot prompt. Type `$` at the start of a message to drop into a shell without leaving your session:
+
+```
+/settings shellShortcut on
+```
+
+Once enabled, pressing `$` at the prompt opens an interactive shell. This makes it easy to run quick commands, check environment state, or validate assumptions without switching windows.
+
 *(v1.0.70+)* The `/settings` command and the `/model` command both support **`--repo` and `--local` flags** for explicitly scoping which layer of settings you want to view or edit:
 
 ```
@@ -469,6 +496,15 @@ The settings dialog supports search — type to filter settings by name. Changes
 ```
 
 These flags mirror the **Repo** and **Repo (local)** scope tabs available in the `/settings` dashboard (v1.0.71+), making it easier to manage per-repository vs. user-global configuration without ambiguity. In v1.0.71+, the `/settings` dashboard also shows **Repo** and **Repo (local)** tabs alongside the existing user-level view, giving you a unified place to see which settings are applied at each layer.
+
+*(v1.0.72+)* The `/model` command also accepts a **`--session` (`-s`) flag** for making temporary per-session changes that do not persist to any settings file:
+
+```
+/model --session                     # change model/effort/context for this session only
+/model --session claude-sonnet-4.6   # switch to a specific model for the current session
+```
+
+Use `--session` when you want to try a different model or reasoning effort level for the current task without affecting your global or repository defaults. The change reverts when the session ends or on `/clear`.
 
 GitHub Copilot CLI has two commands for managing session state, with distinct behaviours:
 
