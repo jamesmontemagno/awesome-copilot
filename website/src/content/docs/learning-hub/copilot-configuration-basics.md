@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
+lastUpdated: 2026-07-21
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -469,6 +469,24 @@ The settings dialog supports search — type to filter settings by name. Changes
 ```
 
 These flags mirror the **Repo** and **Repo (local)** scope tabs available in the `/settings` dashboard (v1.0.71+), making it easier to manage per-repository vs. user-global configuration without ambiguity. In v1.0.71+, the `/settings` dashboard also shows **Repo** and **Repo (local)** tabs alongside the existing user-level view, giving you a unified place to see which settings are applied at each layer.
+
+**Session-scoped model changes** (v1.0.72+): The `/model --session` flag (also `-s`) changes the model, reasoning effort, or context window for **just the current session** without touching your global settings:
+
+```
+/model --session            # open the model picker, changes apply to this session only
+/model -s gpt-4.1           # set a specific model for this session
+```
+
+When the session ends or you start a new one, the global setting resumes automatically. This is useful when a particular task benefits from a different model without permanently changing your default.
+
+**Plan mode model** (v1.0.74+): Use `/model plan` (or `/model --plan`) to set a separate model for [plan mode](https://docs.github.com/en/copilot/). The plan-mode model is only active while you're in plan mode — when you leave, the session model resumes:
+
+```
+/model plan                 # open the model picker for plan mode
+/model --plan               # same as above
+/model --plan off           # clear the plan-mode model override
+/model --plan claude-opus-4 # set a specific model for plan mode
+```
 
 GitHub Copilot CLI has two commands for managing session state, with distinct behaviours:
 

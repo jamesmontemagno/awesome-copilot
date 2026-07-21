@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
+lastUpdated: 2026-07-21
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -369,6 +369,21 @@ Run ESLint after the agent finishes responding and block if there are errors:
 
 If the lint command exits with a non-zero status, the action is blocked.
 
+> **Loop prevention (v1.0.72+)**: An `agentStop` hook that always blocks (always exits non-zero) no longer causes an infinite loop. The CLI ends the turn after **8 consecutive blocks** to prevent runaway cycles. Your hook also receives a `stop_hook_active` flag in its JSON input when a forced continuation is in progress, so it can detect and self-limit:
+>
+> ```bash
+> #!/usr/bin/env bash
+> INPUT=$(cat)
+> FORCED=$(echo "$INPUT" | jq -r '.stop_hook_active // false')
+>
+> # Skip expensive checks if a forced continuation is already underway
+> if [ "$FORCED" = "true" ]; then
+>   exit 0
+> fi
+>
+> npx eslint . --max-warnings 0
+> ```
+
 ### Security Gating with preToolUse
 
 Block dangerous commands before they execute. Use the `matcher` field to target only the `bash` tool, so the hook doesn't fire for file edits or other tools:
@@ -640,6 +655,7 @@ echo "Pre-commit checks passed ✅"
 - Make scripts executable: `chmod +x scripts/pre-commit-check.sh`
 - Test scripts manually before adding them to hooks.json
 - Use reasonable timeouts—formatting a large codebase may need 30+ seconds
+- **Working directory**: Since v1.0.72, lifecycle hooks (`sessionStart`, `sessionEnd`, `agentStop`) and subagent hooks (`subagentStart`, `subagentStop`) run in the **current session directory** after a `/cd` change. This means hook scripts reliably operate on the active project directory, not the directory where the CLI was originally started.
 
 ## Best Practices
 

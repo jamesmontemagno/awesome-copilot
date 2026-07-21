@@ -3,7 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
+lastUpdated: 2026-07-21
 estimatedReadingTime: '8 minutes'
 tags:
   - plugins
@@ -221,6 +221,24 @@ copilot plugin marketplace update
 # Remove a plugin
 copilot plugin uninstall my-plugin
 ```
+
+### Managing from an Interactive Session
+
+Since v1.0.72, `/plugins` supports the same management verbs as the CLI commands, plus skill and MCP server management via dedicated flags:
+
+```
+/plugins update my-plugin                   # update a specific plugin
+/plugins uninstall my-plugin                # remove a plugin
+/plugins enable my-plugin --plugin          # enable a plugin
+/plugins disable my-plugin --plugin         # disable a plugin
+/plugins enable my-mcp --mcp               # enable an MCP server
+/plugins disable my-skill --skill          # disable a skill
+/plugins install --skill ./my-skill/        # install a skill from a local path
+/plugins install --skill https://...        # install a skill from a URL
+/plugins help                               # show all available subcommands
+```
+
+The `--plugin`, `--mcp`, and `--skill` flags let `enable`, `disable`, and `remove` target the right component type without ambiguity.
 
 ### Loading Plugins from a Local Directory
 
