@@ -3,7 +3,7 @@ title: 'Agents and Subagents'
 description: 'Learn how delegated subagents differ from primary agents, when to use them, and how to launch them in VS Code and Copilot CLI.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-01
+lastUpdated: 2026-07-23
 estimatedReadingTime: '9 minutes'
 tags:
   - agents
@@ -134,6 +134,10 @@ The important behavior is different from a single chat turn:
 
 That makes `/fleet` a practical way to launch subagents even if you are not authoring custom agent files yourself.
 
+### Multi-turn subagents
+
+As of v1.0.72, **multi-turn subagents are always enabled** in Copilot CLI. This means you can send follow-up messages to a running subagent — you are not limited to a single prompt/response cycle. The main agent (or you, via the CLI) can issue additional steering messages to an in-progress subagent, making it easier to redirect work mid-task or provide clarification without waiting for the subagent to finish and start a new one.
+
 ### Rubber-duck agent
 
 Available in `/experimental` (v1.0.42+), the **rubber-duck agent** applies a novel multi-model pattern: when you're working in a GPT-powered session, the rubber-duck agent internally routes certain requests through Claude to provide a second perspective. The idea is similar to rubber-duck debugging — talking through a problem with a different "listener" often surfaces assumptions or blind spots you didn't notice.
@@ -211,6 +215,8 @@ No. They can run sequentially when one step depends on another, or in parallel w
 **Can I control how many subagents run simultaneously?**
 
 Yes. In v1.0.66+, usage-based billing users can configure **subagent concurrency and depth limits** directly from `/settings`. The concurrency limit controls how many subagents run in parallel; the depth limit controls how many levels deep delegation can chain (preventing runaway recursive subagent trees). These settings give you predictable control over resource consumption during complex orchestrated tasks.
+
+The **default maximum nesting depth is 4** (lowered from 6 in v1.0.71). Usage-based billing users can adjust `subagents.maxDepth` up to 128 in `/settings`.
 
 ## Next steps
 
