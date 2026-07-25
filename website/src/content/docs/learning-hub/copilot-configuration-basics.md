@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
+lastUpdated: 2026-07-25
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -448,6 +448,25 @@ The model picker opens in a **full-screen view** with inline reasoning effort ad
 **Auto mode and server-side model routing** (v1.0.43+): When you select **Auto** as your model, the CLI uses server-side model routing for real-time model selection. Instead of locking in a single model at session start, Auto mode evaluates each request and routes it to the most appropriate model dynamically. This means straightforward questions can be handled by a faster model while complex reasoning tasks are automatically escalated — without you needing to switch models manually.
 
 **Model family aliases** (v1.0.64+): Instead of typing a full model name, you can use short family aliases in the model setting: `opus`, `sonnet`, `haiku` (Anthropic), and `gpt`, `gemini` (Google/OpenAI). The CLI resolves the alias to the latest available model in that family. This is especially useful in scripts or configuration files where you want to track the best model in a family without hardcoding a version string.
+
+**Session-only model override** *(v1.0.72+)*: The `/model --session` flag (shorthand `-s`) changes the model, reasoning effort, or context window for just the **current session**, leaving your global settings unchanged:
+
+```
+/model --session claude-opus-5          # use Opus 5 for this session only
+/model -s gemini-3.6-flash              # switch to gemini-3.6-flash for this session
+```
+
+When you end or leave the session, the model reverts to your global preference automatically. This is useful when you want to try a different model for a single task without permanently changing your configuration.
+
+**Plan mode model** *(v1.0.74+)*: The `/model plan` command (or `/model --plan`) picks a separate model used specifically during plan mode. Pass a model ID, `off` to clear the override, or no argument to open the picker:
+
+```
+/model plan claude-sonnet-4.6    # use sonnet while planning
+/model --plan gemini-3.6-flash   # alternative syntax
+/model plan off                  # revert to the session model in plan mode
+```
+
+When you leave plan mode, the CLI automatically reverts to your session model.
 
 ### CLI Session Commands
 
