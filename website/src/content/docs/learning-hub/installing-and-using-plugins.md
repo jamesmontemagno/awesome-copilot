@@ -3,7 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
+lastUpdated: 2026-07-25
 estimatedReadingTime: '8 minutes'
 tags:
   - plugins
@@ -296,6 +296,10 @@ A: Yes. Plugin components are merged with your repository's local agents, skills
 **Q: How do I create my own plugin?**
 
 A: Create a directory with a `plugin.json` manifest and your agents/skills/hooks. See the [GitHub docs on creating plugins](https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/plugins-creating) for a step-by-step guide.
+
+**Q: What is Open Plugin Spec and does Copilot CLI support it?**
+
+A: The **Open Plugin Spec v1** is a community-standard plugin manifest format. *(v1.0.74+)* GitHub Copilot CLI now supports Open Plugin Spec v1 plugin manifests alongside the existing `plugin.json` format. This means plugins authored for other AI tools using the Open Plugin Spec can be installed in GitHub Copilot CLI without modification. The CLI also now recognizes **`mcp.json`** as an additional configuration file name for MCP server configurations (alongside the existing `.mcp.json` and `.github/mcp.json`), improving interoperability with tools that use this naming convention.
 
 **Q: Can I share plugins within my organization?**
 
