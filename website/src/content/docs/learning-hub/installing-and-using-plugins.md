@@ -3,7 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
+lastUpdated: 2026-07-26
 estimatedReadingTime: '8 minutes'
 tags:
   - plugins
@@ -73,6 +73,12 @@ The `plugin.json` manifest declares what the plugin contains:
   ]
 }
 ```
+
+### Open Plugin Spec v1 and mcp.json *(v1.0.74+)*
+
+As of v1.0.74, Copilot CLI supports **Open Plugin Spec v1** plugin manifests in addition to the existing `plugin.json` format. This means plugins that follow the Open Plugin Spec standard are installable directly.
+
+In addition, Copilot CLI now recognises **`mcp.json`** as an MCP server configuration file (alongside the existing `.mcp.json`). If your project or plugin includes an `mcp.json` file, its server definitions are loaded automatically — no additional setup required.
 
 ## Why Use Plugins?
 
@@ -203,6 +209,27 @@ Or from an interactive session:
 ### From VS Code
 
 Browse to the plugin via `@agentPlugins` in the Extensions search view or via **Chat: Plugins** in the Command Palette, then click **Install**.
+
+### Installing Individual Skills *(v1.0.72+)*
+
+You can install a single skill directly from a file, URL, or directory — without wrapping it in a full plugin:
+
+```bash
+# Install a skill from a local directory
+copilot plugins install --skill ./my-skill/
+
+# Install a skill from a URL
+copilot plugins install --skill https://example.com/skills/my-skill.zip
+
+# Install into the current repository (project scope)
+copilot plugins install --skill ./my-skill/ --scope project
+```
+
+Installed skills appear in the skill picker and are loaded automatically by agents when relevant. Remove a skill with:
+
+```bash
+copilot plugins remove --skill my-skill
+```
 
 ## Managing Plugins
 
