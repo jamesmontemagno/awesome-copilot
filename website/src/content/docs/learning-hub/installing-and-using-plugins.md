@@ -3,7 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
+lastUpdated: 2026-07-28
 estimatedReadingTime: '8 minutes'
 tags:
   - plugins
@@ -273,6 +273,26 @@ If you only need a single agent or skill (rather than a full plugin), you can st
 - Copy a hook configuration into `.github/hooks/`
 
 See [Using the Copilot Coding Agent](../using-copilot-coding-agent/) for details on this approach.
+
+## Open Plugin Spec v1 Support
+
+*(v1.0.74+)* GitHub Copilot CLI now supports **Open Plugin Spec v1** plugin manifests in addition to its own native `plugin.json` format. The Open Plugin Spec is an emerging open standard for AI agent plugins, enabling interoperability with other AI tools and ecosystems.
+
+### What This Means
+
+If a plugin is authored using Open Plugin Spec v1, you can install and use it in Copilot CLI without any modifications. The CLI detects and reads the spec-compliant manifest automatically.
+
+Additionally, `mcp.json` configuration files (a standard part of the Open Plugin Spec) are now loaded as part of plugin installation. This means plugins from the broader AI ecosystem — not just GitHub Copilot — can bundle MCP server configurations that Copilot CLI will pick up and use.
+
+### Compatibility
+
+| Format | Supported | Notes |
+|--------|-----------|-------|
+| Native `plugin.json` | ✅ | GitHub Copilot's own plugin manifest format |
+| Open Plugin Spec v1 | ✅ *(v1.0.74+)* | Industry-standard plugin manifest format |
+| `mcp.json` (in plugins) | ✅ *(v1.0.74+)* | Auto-loaded MCP server configuration from plugins |
+
+This opens the door to a wider ecosystem of community plugins that can target multiple AI tools at once.
 
 ## Best Practices
 
