@@ -3,11 +3,7 @@ title: 'Understanding MCP Servers'
 description: 'Learn how Model Context Protocol servers extend GitHub Copilot with access to external tools, databases, and APIs.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
-estimatedReadingTime: '8 minutes'
-tags:
-  - mcp
-  - tools
+lastUpdated: 2026-07-29
   - fundamentals
 relatedArticles:
   - ./building-custom-agents.md
@@ -334,6 +330,7 @@ You can also open the `/mcp` manager while the agent is working to toggle server
 - **Version control carefully**: Commit `.mcp.json` or `.vscode/mcp.json` for shared server configurations, but use `.gitignore` for any files containing credentials.
 - **Test server connectivity**: Verify MCP servers start correctly before relying on them in agent workflows. Use `/mcp show` to check status and read stderr output in any failure warnings.
 - **Use the MCP allowlist (experimental)**: In high-security environments, the `MCP_ALLOWLIST` feature flag lets you validate MCP servers against a configured registry, blocking unrecognized servers from loading. MCP servers that are blocked by the allowlist policy are **hidden from `/mcp show`** to avoid confusion — only permitted servers appear in that view. This is an experimental feature for enterprise environments requiring strict control over which MCP servers are permitted.
+- **Faster tool loading** (v1.0.76+): MCP tool definitions are now loaded from definition-scoped snapshots, significantly reducing startup latency for servers with many tools. You can opt out of per-server caching via the MCP server configuration if you need tools to always reflect the latest server-reported definitions.
 
 ### Organization Policy for Third-Party MCP Servers
 
