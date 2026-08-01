@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
+lastUpdated: 2026-08-01
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -223,7 +223,7 @@ The `~/.agents/skills/` path aligns with the VS Code GitHub Copilot for Azure ex
 
 | Field | Description | Example values |
 |-------|-------------|----------------|
-| `model` | The AI model to use for this repository | `"claude-sonnet-4"`, `"gpt-4.1"`, `"claude-sonnet-5"` |
+| `model` | The AI model to use for this repository | `"claude-sonnet-4"`, `"gpt-4.1"`, `"claude-sonnet-5"`, `"grok-4"` |
 | `effortLevel` | Reasoning effort level | `"low"`, `"medium"`, `"high"` |
 | `contextTier` | How much context to include | `"default"`, `"full"` |
 
@@ -429,6 +429,7 @@ CLI settings use **camelCase** naming. Key settings added in recent releases:
 | `proxy` | HTTP(S) proxy URL for all outbound CLI requests (e.g., `http://proxy.example.com:8080`) (v1.0.64+) |
 | `sessionLimits` | Restrict credit or turn usage for a session; limits apply across the current conversation and reset on `/clear` (v1.0.66+) |
 | `stayInAutopilot` | Keep the CLI in autopilot mode after an autopilot task completes, instead of returning to interactive mode (v1.0.69+) |
+| `allowDevToolCaches` | Grant sandboxed builds access to toolchain caches, registries, and installs (on by default); set to `false` to opt out (v1.0.78+) |
 
 > **Note**: Older snake_case names (e.g., `include_gitignored`, `auto_updates_channel`) are still accepted for backward compatibility, but camelCase is now the preferred format.
 
@@ -447,7 +448,7 @@ The model picker opens in a **full-screen view** with inline reasoning effort ad
 
 **Auto mode and server-side model routing** (v1.0.43+): When you select **Auto** as your model, the CLI uses server-side model routing for real-time model selection. Instead of locking in a single model at session start, Auto mode evaluates each request and routes it to the most appropriate model dynamically. This means straightforward questions can be handled by a faster model while complex reasoning tasks are automatically escalated — without you needing to switch models manually.
 
-**Model family aliases** (v1.0.64+): Instead of typing a full model name, you can use short family aliases in the model setting: `opus`, `sonnet`, `haiku` (Anthropic), and `gpt`, `gemini` (Google/OpenAI). The CLI resolves the alias to the latest available model in that family. This is especially useful in scripts or configuration files where you want to track the best model in a family without hardcoding a version string.
+**Model family aliases** (v1.0.64+): Instead of typing a full model name, you can use short family aliases in the model setting: `opus`, `sonnet`, `haiku` (Anthropic), `gpt`, `gemini` (Google/OpenAI), and `grok` (xAI, v1.0.76+). The CLI resolves the alias to the latest available model in that family. This is especially useful in scripts or configuration files where you want to track the best model in a family without hardcoding a version string.
 
 ### CLI Session Commands
 
@@ -494,6 +495,8 @@ You can also name a session at startup with the `--name` flag, and resume it by 
 copilot --name "auth-refactor"          # start a session with a given name
 copilot --resume="auth-refactor"        # resume that session by name
 ```
+
+**Sessions sidebar** *(v1.0.76+, experimental)*: A new Sessions sidebar lets you manage multiple concurrent sessions from a single terminal window — switch between them, spawn new sessions, and see their status at a glance. Enable it with `/experimental on`, then open it from the CLI UI. The sidebar shows each session's name, branch, running/idle status, and lets you switch context without leaving your terminal. This is especially useful when you are running several parallel agents and want to monitor all of them at once.
 
 The `/session delete` command removes sessions you no longer need:
 
@@ -665,6 +668,14 @@ The `/usage` command displays session metrics such as the number of tokens consu
 /usage
 ```
 
+The `/limits predict` command *(v1.0.76+)* analyzes your session history and suggests a sensible AI-credit limit for the current session based on similar past sessions:
+
+```
+/limits predict
+```
+
+Use this to set a budget before starting a long-running agent task. The suggestion is based on the credit usage of comparable sessions, helping you avoid unexpectedly large credit consumption on open-ended tasks.
+
 The `/compact` command summarizes the conversation history to free up context window space while preserving the thread of the conversation. Use it when your context is getting full but you do not want to start a fresh session:
 
 ```
@@ -783,6 +794,23 @@ copilot --config-dir ~/.my-copilot-config
 ```
 
 Set `COPILOT_HOME` in your shell profile to use a custom config directory across all sessions. This is especially useful when running multiple Copilot configurations for different projects or teams.
+
+### Authentication and Login
+
+The `copilot login` command authenticates the CLI with your GitHub account. As of v1.0.77, the default login flow on local interactive terminals is a **browser-based (web) OAuth flow** — your browser opens automatically to complete authentication:
+
+```bash
+copilot login
+```
+
+On remote or headless terminals (such as SSH sessions or CI environments), the default remains the **device code flow** (where you enter a code at github.com/login/device). Use flags to override the flow explicitly:
+
+```bash
+copilot login --web-flow     # force browser-based OAuth (local terminals)
+copilot login --device-code  # force device code flow (headless/remote)
+```
+
+You can also pick the flow interactively from within a running session using the `/login` command. The web flow is faster for local development since it avoids manually copying a device code.
 
 ### Shell Completion
 
