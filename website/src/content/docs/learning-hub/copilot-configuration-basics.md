@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
+lastUpdated: 2026-08-02
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -429,10 +429,23 @@ CLI settings use **camelCase** naming. Key settings added in recent releases:
 | `proxy` | HTTP(S) proxy URL for all outbound CLI requests (e.g., `http://proxy.example.com:8080`) (v1.0.64+) |
 | `sessionLimits` | Restrict credit or turn usage for a session; limits apply across the current conversation and reset on `/clear` (v1.0.66+) |
 | `stayInAutopilot` | Keep the CLI in autopilot mode after an autopilot task completes, instead of returning to interactive mode (v1.0.69+) |
+| `allowDevToolCaches` | Grant sandboxed builds access to toolchain caches, registries, and package installs so builds work without extra setup; on by default — set to `false` to opt out (v1.0.78+) |
 
 > **Note**: Older snake_case names (e.g., `include_gitignored`, `auto_updates_channel`) are still accepted for backward compatibility, but camelCase is now the preferred format.
 
-In addition to the main config file, GitHub Copilot CLI reads two optional per-project files for repository-specific overrides:
+### Authentication (Login)
+
+Use `copilot login` to authenticate with your GitHub account. Starting with v1.0.77, the login flow defaults to **browser-based (web) OAuth** on local interactive terminals — a browser window opens and you authorize the CLI in your GitHub account. On remote or headless terminals (SSH sessions, CI runners), the legacy **device code** flow remains the default.
+
+```bash
+copilot login             # auto-selects the right flow for your environment
+copilot login --web-flow  # force browser-based OAuth
+copilot login --device-code  # force device code flow
+```
+
+You can also pick the flow interactively by running `/login` from inside a Copilot session.
+
+, GitHub Copilot CLI reads two optional per-project files for repository-specific overrides:
 
 - `.claude/settings.json` — committed project settings
 - `.claude/settings.local.json` — local overrides (add to `.gitignore` for personal adjustments)
@@ -717,7 +730,18 @@ Use `/autopilot` when you want to flip between supervised and unsupervised opera
 
 > **Read-only `gh` CLI commands (v1.0.46+)**: Read-only `gh` commands — such as `gh issue list`, `gh pr view`, `gh run status`, and other commands that don't write to GitHub — are **automatically approved** without a permission prompt. Only commands that write to GitHub (like creating issues, merging PRs) still require explicit approval. This reduces friction during exploratory sessions where you frequently check issue or PR status.
 
-The `--effort` flag (shorthand for `--reasoning-effort`) controls how much computational reasoning the model applies to a request:
+The `/permissions` command *(v1.0.78+)* is a convenient shortcut for switching between the available approval modes in the current session:
+
+```
+/permissions          # show current approval mode
+/permissions off      # interactive mode — prompt for each tool call
+/permissions on       # allow-all mode — approve everything automatically
+/permissions auto     # auto mode — LLM judge evaluates each request
+```
+
+`/permissions` consolidates what previously required separate `/allow-all` or `/autopilot` invocations into a single command with a unified interface. Use it when you want a quick reminder of which mode is active or need to switch modes without remembering the exact `/allow-all` syntax.
+
+ (shorthand for `--reasoning-effort`) controls how much computational reasoning the model applies to a request:
 
 ```bash
 gh copilot --effort high "Refactor the authentication module"
@@ -761,7 +785,9 @@ copilot --no-sandbox -p "Set up development environment with system tools"
 
 These flags apply only to the current invocation — your persisted sandbox preference remains unchanged.
 
-The `--attachment` flag (available in prompt mode, `-p`) lets you attach files — images or native documents — to the initial prompt in non-interactive mode:
+> **Enterprise MDM sandbox policy (v1.0.77+)**: Organizations can enforce a restrictive sandbox floor via macOS and Windows native MDM (Mobile Device Management) settings. Managed settings can only _tighten_ the user's sandbox policy — they can never loosen it. The `/sandbox` dialog in managed environments surfaces the org-configured values with locked fields and managed filesystem paths, so administrators can confirm what is enforced. This is especially useful for ensuring that developers in regulated industries always run with sandbox protections enabled, regardless of individual preferences.
+
+ (available in prompt mode, `-p`) lets you attach files — images or native documents — to the initial prompt in non-interactive mode:
 
 ```bash
 copilot -p "Summarize the architecture shown in these diagrams" \
