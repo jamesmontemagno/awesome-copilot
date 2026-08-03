@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
+lastUpdated: 2026-08-03
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -429,6 +429,8 @@ CLI settings use **camelCase** naming. Key settings added in recent releases:
 | `proxy` | HTTP(S) proxy URL for all outbound CLI requests (e.g., `http://proxy.example.com:8080`) (v1.0.64+) |
 | `sessionLimits` | Restrict credit or turn usage for a session; limits apply across the current conversation and reset on `/clear` (v1.0.66+) |
 | `stayInAutopilot` | Keep the CLI in autopilot mode after an autopilot task completes, instead of returning to interactive mode (v1.0.69+) |
+| `sidebar.hoverFocus` | Enable hover-to-focus in the Sessions sidebar (off by default as of v1.0.76+) |
+| `sidebar.accentActiveSession` | Accent the active session card in the sidebar (on by default as of v1.0.76+) |
 
 > **Note**: Older snake_case names (e.g., `include_gitignored`, `auto_updates_channel`) are still accepted for backward compatibility, but camelCase is now the preferred format.
 
@@ -448,6 +450,17 @@ The model picker opens in a **full-screen view** with inline reasoning effort ad
 **Auto mode and server-side model routing** (v1.0.43+): When you select **Auto** as your model, the CLI uses server-side model routing for real-time model selection. Instead of locking in a single model at session start, Auto mode evaluates each request and routes it to the most appropriate model dynamically. This means straightforward questions can be handled by a faster model while complex reasoning tasks are automatically escalated — without you needing to switch models manually.
 
 **Model family aliases** (v1.0.64+): Instead of typing a full model name, you can use short family aliases in the model setting: `opus`, `sonnet`, `haiku` (Anthropic), and `gpt`, `gemini` (Google/OpenAI). The CLI resolves the alias to the latest available model in that family. This is especially useful in scripts or configuration files where you want to track the best model in a family without hardcoding a version string.
+
+**Plan mode model** (v1.0.74+): Use `/model plan` (or `/model --plan`) to select a separate model specifically for plan mode. This lets you use a high-quality reasoning model during planning while keeping a faster model for execution:
+
+```
+/model plan               # open the model picker for plan mode
+/model --plan             # same as above
+/model plan claude-opus-5 # set a specific model for plan mode
+/model plan off           # clear the plan mode model override
+```
+
+When you leave plan mode, the session reverts to your normal session model.
 
 ### CLI Session Commands
 
@@ -627,6 +640,15 @@ Use `/diagnose` when a session is behaving unexpectedly — it inspects session 
 
 **Keyboard shortcuts for queuing messages**: Use **Ctrl+Q** or **Ctrl+Enter** to queue a message (send it while the agent is still working). **Ctrl+D** no longer queues messages — it now has its default terminal behavior. If you have muscle memory for Ctrl+D queuing, switch to Ctrl+Q.
 
+**Directable queue manager** (v1.0.76+): Once messages are queued, you can manage them with the **queue manager** (also called "staff"). Open it to reorder messages in the queue, edit their content before they are sent, remove entries you no longer need, repeat a message, or immediately send the highlighted message to skip the queue entirely. This gives you precise control over what runs next without having to cancel the current operation.
+
+**Sessions sidebar** *(experimental, v1.0.76+)*: The Sessions sidebar lets you manage multiple concurrent sessions from within a single CLI window — switch between them, spawn new ones, and see each session's status at a glance. Enable it with `/experimental on`, then navigate sessions with arrow keys; press **n** to spawn a new session or **x** twice to close one. The sidebar remembers open sessions across restarts. Fine-tune its behavior:
+
+```
+/settings sidebar.hoverFocus on|off    # hover-to-focus (off by default)
+/settings sidebar.accentActiveSession on|off  # highlight the active card
+```
+
 **Background running tasks**: Press **Ctrl+X → B** to move the current running task or shell command to the background. The task continues executing while you can type a new message or review earlier output. This is useful for long-running commands where you want to interact with the agent while waiting for the result.
 
 **Shell command history in normal mode** (v1.0.65+): The **↑/↓** arrow keys and **Ctrl+R** reverse search now include past shell commands (commands run with `!`) while you are in normal (non-shell) input mode. Previously you had to type `!` to enter shell mode before history worked. Now you can recall and re-run a shell command without switching modes first — useful for quickly repeating a build, test, or diagnostic command from earlier in the session.
@@ -664,6 +686,14 @@ The `/usage` command displays session metrics such as the number of tokens consu
 ```
 /usage
 ```
+
+The `/limits predict` command *(v1.0.76+)* analyzes your past usage patterns and suggests an appropriate AI-credit limit for the current session, helping you avoid unexpectedly running out of credits on long-running tasks:
+
+```
+/limits predict
+```
+
+Use it at the start of a complex or potentially expensive task to get a data-driven recommendation for `sessionLimits`.
 
 The `/compact` command summarizes the conversation history to free up context window space while preserving the thread of the conversation. Use it when your context is getting full but you do not want to start a fresh session:
 
@@ -726,6 +756,16 @@ gh copilot --effort high "Refactor the authentication module"
 Accepted values are `low`, `medium`, and `high`. You can also set a default via the `effortLevel` config setting.
 
 ### CLI Startup Flags
+
+**Browser-based (web) OAuth login** *(v1.0.77+)*: Running `copilot login` on a local desktop now opens your browser for authentication by default — no device code required. On remote or headless terminals the device-code flow remains the default. You can force either flow explicitly:
+
+```bash
+copilot login                 # browser flow on local terminals (default)
+copilot login --web-flow      # always open a browser
+copilot login --device-code   # always use device code
+```
+
+You can also choose the login method interactively from inside a session via `/login`.
 
 The `-C <directory>` flag changes the working directory before starting, similar to `git -C` (v1.0.42+). This is useful for scripts or aliases that need to start Copilot CLI in a specific project directory without a separate `cd`:
 
