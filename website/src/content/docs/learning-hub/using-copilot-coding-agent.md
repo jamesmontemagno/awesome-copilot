@@ -3,7 +3,7 @@ title: 'Using the Copilot Coding Agent'
 description: 'Learn how to use GitHub Copilot coding agent to autonomously work on issues, generate pull requests, and automate development tasks.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-05-13
+lastUpdated: 2026-08-07
 estimatedReadingTime: '12 minutes'
 tags:
   - coding-agent
@@ -337,6 +337,16 @@ This repository provides a curated collection of agents, skills, and hooks desig
 ## Remote Control
 
 You can connect to and steer a running coding agent session from a local Copilot CLI terminal using **remote control**. This lets you observe the agent's progress, send follow-up prompts, and redirect its work in real time — without waiting for it to open a PR first.
+
+### Plan First, Then Autopilot
+
+You can combine `--plan` and `--mode autopilot` when starting a session to get the best of both worlds: the agent first produces a plan for your review, and once you approve it, it continues on autopilot to implement the plan without waiting for further approvals:
+
+```bash
+copilot --plan --mode autopilot
+```
+
+This is ideal for longer tasks where you want to validate the approach before letting the agent run freely. The agent pauses after planning and resumes only after you confirm.
 
 ### Starting a Remote-Controlled Session
 
