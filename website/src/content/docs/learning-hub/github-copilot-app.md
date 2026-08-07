@@ -3,7 +3,7 @@ title: 'Getting Started with the GitHub Copilot app'
 description: 'Learn about the GitHub Copilot app, a desktop experience built for agent-native development. Understand its key features and who it''s for.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-06-17
+lastUpdated: 2026-08-07
 estimatedReadingTime: '8 minutes'
 tags:
   - copilot-app
@@ -77,6 +77,17 @@ This makes it easy to dispatch multiple agents and trust they won't interfere wi
 
 For a hands-on guide to building canvases with `/create-canvas`, see [Working with Canvas Extensions](../working-with-canvas-extensions/).
 
+### Sessions Tab and Concurrent Sessions
+
+The **Sessions tab** and sidebar let you manage multiple active sessions from a single view. You can:
+
+- See all running sessions and their status at a glance
+- Switch between sessions without losing context
+- Spawn new sessions directly from the sidebar
+- Monitor which sessions are active, paused, or finished
+
+This makes it easy to run several agents in parallel—for example, fixing a bug in one session while refactoring in another—and keep track of everything without jumping between windows.
+
 ### Agent Merge
 
 **Agent Merge** is a feature that can carry your pull requests through the entire workflow:
@@ -145,6 +156,16 @@ Once installed, you can create a session by:
 3. **From your inbox**: The app syncs your GitHub inbox—click an issue and start a session for it
 
 Each session runs in its own worktree with its own isolated environment. You can run multiple sessions in parallel.
+
+### Starting Sessions from the Terminal with `/worktree new`
+
+If you're working in the Copilot CLI, you can start a new session in a fresh isolated worktree directly:
+
+```
+/worktree new
+```
+
+This creates a new worktree and opens a new session inside it, keeping your current work undisturbed. It's the fastest way to branch off a parallel task mid-session without leaving the terminal.
 
 ### Launching Sessions from the Terminal with Deep Links
 
