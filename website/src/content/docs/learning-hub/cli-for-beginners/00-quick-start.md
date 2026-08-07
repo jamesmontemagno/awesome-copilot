@@ -3,7 +3,7 @@ title: '00 · Quick Start'
 description: 'Install GitHub Copilot CLI, authenticate, and verify your environment with the same flow as the source course.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-05-08
+lastUpdated: 2026-08-07
 ---
 
 ![Chapter 00: Quick Start](/images/learning-hub/copilot-cli-for-beginners/00/chapter-header.png)
@@ -135,17 +135,19 @@ After trusting the folder, you can sign in with your GitHub account.
 > /login
 ```
 
-**What happens next:**
+**What happens next (local terminal):**
 
-1. Copilot CLI displays a one-time code (like `ABCD-1234`)
-2. Your browser opens to GitHub's device authorization page. Sign in to GitHub if you haven't already.
-3. Enter the code when prompted
-4. Select "Authorize" to grant GitHub Copilot CLI access
-5. Return to your terminal - you're now signed in!
+1. Your browser opens automatically to GitHub's authorization page. Sign in to GitHub if you haven't already.
+2. Select "Authorize" to grant GitHub Copilot CLI access.
+3. Return to your terminal — you're now signed in!
+
+> 💡 **Remote or headless terminals**: If you're on a remote server or a terminal without a browser (such as SSH), Copilot CLI falls back to the **device code flow** instead. You'll see a one-time code (like `ABCD-1234`) — visit [github.com/login/device](https://github.com/login/device) in a browser and enter the code to complete sign-in.
+
+> 💡 **Force a specific flow**: Use `--web-flow` to always use the browser popup, or `--device-code` to always use the code-based flow. You can also pick interactively with `/login`.
 
 <img src="/images/learning-hub/copilot-cli-for-beginners/00/auth-device-flow.png" alt="Device Authorization Flow - showing the 5-step process from terminal login to signed-in confirmation" width="800"/>
 
-*The device authorization flow: your terminal generates a code, you verify it in the browser, and Copilot CLI is authenticated.*
+*The browser-based flow: your browser opens automatically and you authorize in one click. On remote/headless terminals, a device code is shown instead.*
 
 **Tip**: The sign-in persists across sessions. You only need to do this once unless your token expires or you explicitly sign out.
 
@@ -259,7 +261,7 @@ copilot
 
 ### Browser doesn't open automatically
 
-Manually visit [github.com/login/device](https://github.com/login/device) and enter the code shown in your terminal.
+On remote or headless terminals, the device code flow is used instead. Your terminal will display a one-time code — manually visit [github.com/login/device](https://github.com/login/device) and enter it. On a local terminal, try running `/login --web-flow` to force the browser popup.
 
 ### Token expired
 

@@ -3,7 +3,7 @@ title: '01 · First Steps'
 description: 'Experience your first GitHub Copilot CLI demos and learn the three main interaction modes.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-06-19
+lastUpdated: 2026-08-07
 ---
 
 ![Chapter 01: First Steps](/images/learning-hub/copilot-cli-for-beginners/01/chapter-header.png)
@@ -389,11 +389,13 @@ That's it for getting started! As you become comfortable, you can explore additi
 
 | Command | What It Does |
 |---------|--------------|
-| `/init` | Initialize Copilot instructions for your repository |
 | `/agent` | Browse and select from available agents |
-| `/skills` | Manage skills for enhanced capabilities |
+| `/env` | Show loaded environment details — what instructions, MCP servers, skills, agents, and plugins are active |
+| `/init` | Initialize Copilot instructions for your repository |
 | `/mcp` | Manage MCP server configuration |
+| `/plugins` | Enable or disable plugins, instructions, agents, LSP servers, and hooks without restarting the session |
 | `/settings` | Open an interactive dialog to browse and edit all user settings in one place |
+| `/skills` | Manage skills for enhanced capabilities |
 
 > 💡 Skills are covered in detail in [Chapter 05](../05-skills/). MCP servers are covered in [Chapter 06](../06-mcp-servers/).
 
@@ -420,34 +422,50 @@ That's it for getting started! As you become comfortable, you can explore additi
 
 | Command | What It Does |
 |---------|--------------|
-| `/allow-all` | Auto-approve all permission prompts for this session |
 | `/add-dir <directory>` | Add a directory to allowed list |
-| `/list-dirs` | Show all allowed directories |
+| `/allow-all [on\|off\|show]` | Auto-approve all permission prompts; use `on` to enable, `off` to disable, `show` to check current status |
+| `/permissions` | Switch between approval modes (interactive, plan, autopilot) for controlling how much Copilot can do without asking |
+| `/yolo` | Quick alias for `/allow-all on` — auto-approves all permission prompts. |
 | `/cwd`, `/cd [directory]` | View or change working directory |
+| `/list-dirs` | Show all allowed directories |
 
-> ⚠️ **Use with caution**: `/allow-all` skips confirmation prompts. Great for trusted projects, but be careful with untrusted code.
+> ⚠️ **Use with caution**: `/allow-all` and `/yolo` skip confirmation prompts. Great for trusted projects, but be careful with untrusted code.
 
 ### Session
 
 | Command | What It Does |
 |---------|--------------|
-| `/resume` | Switch to a different session (optionally specify session ID) |
-| `/rename` | Rename the current session |
+| `/clear` | Abandons the current session (no history saved) and starts a fresh conversation |
+| `/compact` | Summarize conversation to reduce context usage (optionally add focus instructions, e.g. `/compact focus on the bug list`) |
 | `/context` | Show context window token usage and visualization |
-| `/usage` | Display session usage metrics and statistics |
-| `/session` | Show session info and workspace summary |
-| `/compact` | Summarize conversation to reduce context usage |
-| `/share` | Export session as markdown file or GitHub gist |
+| `/keep-alive` | Prevent your system from sleeping while Copilot CLI is active — handy for long-running tasks on a laptop |
+| `/memory [on\|off\|show]` | Enable, disable, or view persistent memory — facts and preferences remembered across all sessions |
+| `/new` | Ends the current session (saving it to history for search/resume) and starts a fresh conversation. |
+| `/resume` | Switch to a different session (optionally specify session ID or name) |
+| `/rename` | Rename the current session (omit the name to auto-generate one) |
+| `/rewind` | Open a timeline picker to roll back to any earlier point in the conversation |
+| `/usage` | Display session usage metrics and statistics, including quota progress bars |
+| `/session` | Show session info and workspace summary; use `/session delete`, `/session delete <id>`, or `/session delete-all` to remove sessions |
+| `/share` | Export session as a markdown file, GitHub gist, or self-contained HTML file |
+| `/every <interval> <prompt>` | Schedule a prompt to run on a recurring interval (e.g., `/every 1h summarize new commits`). Use natural language for the interval. `/loop` is an alias for `/every`. |
+| `/after <time> <prompt>` | Schedule a prompt to run once after a delay (e.g., `/after 30m run tests`). Use natural language for the time. |
+
+### Display
+
+| Command | What It Does |
+|---------|--------------|
+| `/statusline` (or `/footer`) | Customize which items appear in the status bar at the bottom of the session (directory, branch, effort, context window, quota) |
+| `/theme` | View or set terminal theme |
+| `/voice` | Dictate your prompt using local speech-to-text — speak naturally instead of typing |
 
 ### Help and Feedback
 
 | Command | What It Does |
 |---------|--------------|
 | `/app` | Open the GitHub app (or browser fallback) directly from the CLI |
-| `/help` | Show all available commands |
 | `/changelog` | Display changelog for CLI versions |
 | `/feedback` | Submit feedback to GitHub |
-| `/theme` | View or set terminal theme |
+| `/help` | Show all available commands |
 
 ### Quick Shell Commands
 
@@ -475,6 +493,10 @@ copilot
 ```
 
 > 💡 **Tip**: Some models cost more "premium requests" than others. Models marked **1x** (like Claude Sonnet 4.5) are a great default. They're capable and efficient. Higher-multiplier models use your premium request quota faster, so save those for when you really need them.
+
+> 💡 **Not sure which model to pick?** Select **`Auto`** from the model picker to let Copilot automatically choose the best available model for each session. This is a great default if you're just getting started and don't want to think about model selection.
+
+> 💡 **Model family shortcuts**: You can also type a short family alias — like `opus`, `sonnet`, `haiku`, `gpt`, or `gemini` — directly in the `/model` picker instead of scrolling through the full list. Copilot will pick the best available model in that family for you.
 
 </details>
 
