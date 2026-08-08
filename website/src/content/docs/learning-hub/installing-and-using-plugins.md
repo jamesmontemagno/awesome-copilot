@@ -3,7 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
+lastUpdated: 2026-08-08
 estimatedReadingTime: '8 minutes'
 tags:
   - plugins
@@ -221,6 +221,27 @@ copilot plugin marketplace update
 # Remove a plugin
 copilot plugin uninstall my-plugin
 ```
+
+### Automatic Updates for First-Party Plugins
+
+*(v1.0.78+)* First-party plugins (those from the official `copilot-plugins` marketplace) **automatically update to the latest version at session start**. You'll always have the most recent capabilities without running any manual update commands. Third-party and community plugins are not auto-updated — use `copilot plugin update` to update them on your own schedule.
+
+### Enabling and Disabling Individual Components
+
+*(v1.0.76+)* From an interactive session, you can toggle individual components inside a plugin without uninstalling it:
+
+```
+/plugins enable <plugin-name>        # enable an installed plugin
+/plugins disable <plugin-name>       # disable without uninstalling
+/plugins enable --mcp <server-name>  # enable a specific MCP server
+/plugins disable --skill <skill>     # disable a specific skill
+```
+
+Disabled components are skipped at runtime but remain installed, making it easy to turn things on or off without losing your configuration.
+
+### Open Plugin Spec v1
+
+*(v1.0.74+)* Copilot CLI supports the **Open Plugin Spec v1** manifest format (`mcp.json`) in addition to the native `plugin.json` format. This means you can install plugins authored for other compatible tools directly — no conversion required.
 
 ### Loading Plugins from a Local Directory
 
