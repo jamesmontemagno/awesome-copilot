@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
+lastUpdated: 2026-08-09
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -429,6 +429,7 @@ CLI settings use **camelCase** naming. Key settings added in recent releases:
 | `proxy` | HTTP(S) proxy URL for all outbound CLI requests (e.g., `http://proxy.example.com:8080`) (v1.0.64+) |
 | `sessionLimits` | Restrict credit or turn usage for a session; limits apply across the current conversation and reset on `/clear` (v1.0.66+) |
 | `stayInAutopilot` | Keep the CLI in autopilot mode after an autopilot task completes, instead of returning to interactive mode (v1.0.69+) |
+| `allowDevToolCaches` | *(v1.0.78+, on by default)* Grant sandboxed builds access to toolchain caches, registries, and installs so builds work without extra setup. Set to `false` to opt out. |
 
 > **Note**: Older snake_case names (e.g., `include_gitignored`, `auto_updates_channel`) are still accepted for backward compatibility, but camelCase is now the preferred format.
 
@@ -507,11 +508,13 @@ You can also press **x** on a highlighted session in the session picker (`--resu
 
 In the session picker, press **`s`** to cycle the sort order: relevance, last used, created, or name. The picker also shows the branch name and idle/in-use status for each session.
 
-The `/rewind` command opens a timeline picker that lets you roll back the conversation to any earlier point in history, reverting both the conversation and any file changes made after that point. You can also trigger it by pressing **double-Esc**:
+The `/rewind` command opens a timeline picker that lets you roll back the conversation to any earlier point in history. You can also trigger it by pressing **double-Esc**:
 
 ```
 /rewind
 ```
+
+When you select a rewind point, you can choose to restore just the conversation or both the conversation and the files Copilot changed. *(v1.0.78+)* `/rewind` no longer requires git — it restores only the files Copilot actually changed (skipping any whose current contents differ from what Copilot last wrote), so it works in any directory regardless of version control.
 
 Use `/rewind` when you want to branch off from a different point in the conversation, rather than just undoing the most recent turn.
 
@@ -556,6 +559,14 @@ In v1.0.66+, you can pass a task description to `/worktree` to name the branch f
 This creates a branch named from your task description and begins working on it immediately, making it easy to spin up parallel work without stopping to think of a branch name.
 
 After the command runs, the session is inside the new worktree. Use this when you want to work on a second task in parallel without stashing changes or opening a new terminal. In v1.0.64+ you can also use the experimental `--worktree` flag at startup (`copilot -w [name]`) to create or reuse a worktree under `<repo>.worktrees/` before the session begins.
+
+The `/new-worktree` command *(v1.0.78, experimental)* combines worktree creation with a new conversation in a single step. Unlike `/worktree` (which switches the current session into a new worktree), `/new-worktree` creates the worktree **and** opens a fresh conversation in it while leaving your current session untouched:
+
+```
+/new-worktree my-feature-branch
+```
+
+Use `/new-worktree` when you want to hand off a task to a clean context without interrupting your current work — for example, starting a parallel bug fix while your current session continues a larger refactor.
 
 The `/every` command (also available as `/loop` since v1.0.64) schedules a recurring prompt to run automatically at a specified interval. The companion `/after` command runs a prompt once after a specified delay. Both are useful for self-paced automation — polling for results, periodically summarizing progress, or triggering other slash commands on a timer:
 
@@ -616,6 +627,14 @@ The `/chronicle skills review` subcommand *(v1.0.66+)* opens an interactive revi
 This keeps you in control of skill evolution — the agent can propose skill improvements as it discovers reusable patterns, but nothing is applied until you explicitly approve each change.
 
 > **Note**: Session history, file tracking, and the `/chronicle` command were previously experimental features. As of v1.0.40, they are available to all users without enabling experimental mode.
+
+The `/limits predict` command *(v1.0.76+)* analyzes similar past sessions and suggests an appropriate AI-credit session limit:
+
+```
+/limits predict
+```
+
+Use it before starting a long agentic task to get an estimate of expected credit consumption, then set a limit with `/limits` to prevent runaway spend.
 
 The `/diagnose` command (v1.0.64+) analyzes the current session's logs and surfaces diagnostic information to help troubleshoot unexpected behavior, performance issues, or errors:
 
@@ -690,6 +709,14 @@ The `/keep-alive` command prevents the system from sleeping while Copilot CLI is
 ```
 
 > **Note**: `/keep-alive` was previously an experimental feature. As of v1.0.36, it is available without enabling experimental mode.
+
+The `/permissions` command *(v1.0.78+)* opens an interactive panel to switch between approval modes without leaving the session:
+
+```
+/permissions
+```
+
+Use `/permissions` to move between **interactive** (confirm each tool call), **autopilot** (approve everything), and **auto** (LLM-judged approval) modes mid-session. This is a faster alternative to typing `/allow-all on`, `/allow-all off`, or `/allow-all auto` — especially when you want to review exactly which mode is currently active before changing it.
 
 The `/allow-all` command (also accessible as `/yolo`) enables autopilot mode, where the agent runs all tools without asking for confirmation. It now supports `on`, `off`, and `show` subcommands:
 
@@ -785,6 +812,8 @@ copilot --config-dir ~/.my-copilot-config
 Set `COPILOT_HOME` in your shell profile to use a custom config directory across all sessions. This is especially useful when running multiple Copilot configurations for different projects or teams.
 
 ### Shell Completion
+
+> **Authentication (v1.0.77+)**: `copilot login` now uses a **browser-based OAuth flow** by default on local interactive terminals. A browser tab opens automatically to complete sign-in — no device code needed. Remote and headless environments (CI, SSH) continue to use the device code flow. Use `--web-flow` or `--device-code` to force a specific mode, or pick one from the interactive `/login` command.
 
 The `copilot completion` subcommand generates a static shell completion script for subcommands, flags, and known option values. Once installed, pressing Tab auto-completes Copilot CLI commands in your terminal.
 
