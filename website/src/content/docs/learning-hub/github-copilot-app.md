@@ -3,7 +3,7 @@ title: 'Getting Started with the GitHub Copilot app'
 description: 'Learn about the GitHub Copilot app, a desktop experience built for agent-native development. Understand its key features and who it''s for.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-06-17
+lastUpdated: 2026-08-10
 estimatedReadingTime: '8 minutes'
 tags:
   - copilot-app
@@ -65,6 +65,14 @@ Each session the Copilot app creates runs in its own **git worktree**—a real, 
 - No manual branch juggling or cleanup required—the app handles it all
 - You can pick up a session from any device, on any worktree
 
+**Creating a new worktree from the CLI**: Use `/worktree new` inside a Copilot CLI session to start a new session in a fresh worktree from your current HEAD. You can control whether worktree commands start from HEAD or your remote default branch by setting `worktreeBaseRef` in your settings:
+
+```json
+{
+  "worktreeBaseRef": "head"  // "head" (default) or "remote"
+}
+```
+
 This makes it easy to dispatch multiple agents and trust they won't interfere with each other.
 
 ### Canvases
@@ -76,6 +84,14 @@ This makes it easy to dispatch multiple agents and trust they won't interfere wi
 - This makes it easy to see exactly what an agent is doing and step in when needed
 
 For a hands-on guide to building canvases with `/create-canvas`, see [Working with Canvas Extensions](../working-with-canvas-extensions/).
+
+### Sessions Tab
+
+The **Sessions tab** lets you manage multiple concurrent Copilot CLI sessions from a single view. Each session appears in the sidebar with its current status, and you can switch between them, monitor their timelines, and queue follow-up prompts — all without losing context.
+
+**Queuing prompts**: You can queue prompts, shell commands, and supported slash commands in a local session so they run in order after the current task finishes. This is useful when you know the next steps in advance and want to keep the agent working without waiting.
+
+**Connecting from the CLI to the app**: Use `/app` inside a running CLI session to open that session directly in the GitHub Copilot desktop app (requires Copilot app v1.1.3 or later). This lets you seamlessly hand off from terminal to the app's visual interface.
 
 ### Agent Merge
 
