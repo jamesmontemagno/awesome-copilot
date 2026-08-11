@@ -3,7 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
+lastUpdated: 2026-08-11
 estimatedReadingTime: '8 minutes'
 tags:
   - plugins
@@ -34,6 +34,7 @@ A plugin bundles one or more of the following components:
 | **MCP Servers** | Model Context Protocol integrations for external tools | `.mcp.json` or `.github/mcp.json` |
 | **LSP Servers** | Language Server Protocol integrations | `lsp.json` or `.github/lsp.json` |
 | **Extensions** | IDE extensions installable via the plugin marketplace (v1.0.62+) | `extensions/` |
+| **Canvas Extensions** | Copilot app canvas extensions (v1.0.79+) | `com.github.copilot/extensions/` |
 
 A plugin might include all of these or just one — for example, a plugin could provide a single specialized agent, or an entire development toolkit with multiple agents, skills, hooks, and MCP server configurations working together.
 
@@ -181,6 +182,22 @@ Pinning to a SHA guarantees that everyone on the team installs plugins from exac
 - **Reproducible CI environments** — ensure builds always use the same plugin versions
 - **Change control** — review and approve plugin updates before rolling them out team-wide
 - **Stability** — prevent breaking changes in upstream marketplaces from impacting your team without notice
+
+**Auto-updating marketplace plugins** (v1.0.79+): Set `"autoUpdate": true` on an `extraKnownMarketplaces` entry to automatically update its plugins at session start — no manual `copilot plugin update` required:
+
+```json
+{
+  "extraKnownMarketplaces": [
+    {
+      "name": "my-org-plugins",
+      "source": "my-org/internal-plugins",
+      "autoUpdate": true
+    }
+  ]
+}
+```
+
+This is useful for internal marketplaces where you always want the latest version without relying on team members to run update commands manually.
 
 ## Installing Plugins
 

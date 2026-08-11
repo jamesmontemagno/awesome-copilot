@@ -3,7 +3,7 @@ title: 'Getting Started with the GitHub Copilot app'
 description: 'Learn about the GitHub Copilot app, a desktop experience built for agent-native development. Understand its key features and who it''s for.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-06-17
+lastUpdated: 2026-08-11
 estimatedReadingTime: '8 minutes'
 tags:
   - copilot-app
@@ -49,6 +49,17 @@ The central hub of the Copilot app is the **My Work** view. This dashboard shows
 - **Overall status**: A quick overview of what's in progress, what's done, and what's blocked
 
 Instead of checking GitHub, your CLI, and VS Code for updates, everything is in one place.
+
+### Sessions Tab and Concurrent Session Management
+
+*(v1.0.79+)* The **Sessions tab** and sidebar let you manage multiple concurrent sessions from a single view. Each active session — whether it's working on a bug fix, a feature, or an automation — appears in the sessions list with its current status.
+
+This is especially useful when:
+- Running multiple agents in parallel on different tasks
+- Switching between active sessions without losing context
+- Getting an overview of all in-flight work before starting something new
+
+Click any session in the sidebar to switch to it and see its live timeline.
 
 ### Automations
 
