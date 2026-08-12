@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
+lastUpdated: 2026-08-12
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -449,6 +449,17 @@ The model picker opens in a **full-screen view** with inline reasoning effort ad
 
 **Model family aliases** (v1.0.64+): Instead of typing a full model name, you can use short family aliases in the model setting: `opus`, `sonnet`, `haiku` (Anthropic), and `gpt`, `gemini` (Google/OpenAI). The CLI resolves the alias to the latest available model in that family. This is especially useful in scripts or configuration files where you want to track the best model in a family without hardcoding a version string.
 
+**Model picker groups** (v1.0.79+): The model picker groups models into **Recent**, **Recommended**, **New**, and other sections so you can find models more quickly. Use **Shift+Tab** to cycle between grouping views. This makes it easier to discover newly added models or return to models you've used before.
+
+**Session-scoped `/model` and `/config model`** (v1.0.79+): `/model` is now **session-scoped by default** — changing the model applies only to the current session and does not affect future sessions. To set a persistent model default for all future sessions, use the new `/config model` command:
+
+```
+/model claude-sonnet-4.6      # change model for this session only
+/config model claude-sonnet-4.6  # set model default for future sessions
+```
+
+This replaces the previous behavior where `/model` would persist across sessions. If you relied on `/model` to change your default model, switch to `/config model` instead.
+
 ### CLI Session Commands
 
 The `/settings` command (v1.0.61+) opens an interactive dialog to browse and edit all user settings in one place. Use it to discover available settings, toggle options, and update values without manually editing your config file:
@@ -507,6 +518,8 @@ You can also press **x** on a highlighted session in the session picker (`--resu
 
 In the session picker, press **`s`** to cycle the sort order: relevance, last used, created, or name. The picker also shows the branch name and idle/in-use status for each session.
 
+**Sessions tab and sidebar** (v1.0.79+): The CLI now includes a **Sessions tab** in the sidebar that lets you manage multiple concurrent sessions at a glance. Switch between active sessions, see their status, and select which session to bring into focus — all without leaving your current terminal.
+
 The `/rewind` command opens a timeline picker that lets you roll back the conversation to any earlier point in history, reverting both the conversation and any file changes made after that point. You can also trigger it by pressing **double-Esc**:
 
 ```
@@ -554,6 +567,22 @@ In v1.0.66+, you can pass a task description to `/worktree` to name the branch f
 ```
 
 This creates a branch named from your task description and begins working on it immediately, making it easy to spin up parallel work without stopping to think of a branch name.
+
+**`/worktree new`** (v1.0.79+): Start a fresh session in a new worktree without carrying over any uncommitted changes. Unlike `/worktree <branch>` which moves your current changes into the new worktree, `/worktree new` creates a clean worktree from the current state:
+
+```
+/worktree new my-feature-branch    # new session, clean worktree
+```
+
+**`worktreeBaseRef` setting** (v1.0.79+): Control whether `/worktree`, `/worktree new`, and `--worktree` start from `HEAD` or the remote default branch. All three now default to `HEAD`. To change the base for new worktrees, set `worktreeBaseRef` in your config:
+
+```json
+{
+  "worktreeBaseRef": "origin/main"
+}
+```
+
+> **Note**: Previously `--worktree` started from the remote default branch. As of v1.0.79, it starts from `HEAD` like the other commands. Set `worktreeBaseRef` explicitly if you want to restore the old behavior.
 
 After the command runs, the session is inside the new worktree. Use this when you want to work on a second task in parallel without stashing changes or opening a new terminal. In v1.0.64+ you can also use the experimental `--worktree` flag at startup (`copilot -w [name]`) to create or reuse a worktree under `<repo>.worktrees/` before the session begins.
 
@@ -740,7 +769,10 @@ The `--mode` flag (along with its aliases `--autopilot` and `--plan`) lets you l
 copilot --mode agent    # start in agent mode (autonomous tool use)
 copilot --autopilot     # alias for --mode autopilot (allow-all)
 copilot --plan          # start in plan mode (propose without executing)
+copilot --plan --mode autopilot "Refactor the auth module"  # plan first, then implement automatically
 ```
+
+Combining `--plan` with `--mode autopilot` (v1.0.79+) lets the agent first produce a plan for your review, then switch to autopilot to implement it — all without waiting for manual approval between phases. This is useful for complex tasks where you want to see the proposed approach before committing to full autonomous execution.
 
 This is useful in scripts or CI pipelines where you want the CLI to immediately begin working in a specific mode without an interactive prompt.
 
