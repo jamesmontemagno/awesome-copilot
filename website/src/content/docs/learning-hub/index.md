@@ -23,6 +23,8 @@ Essential concepts to tailor GitHub Copilot beyond its default experience. Start
 and work through the full track to master every customization primitive. For delegation
 and orchestration patterns, continue with [Agents and Subagents](agents-and-subagents/).
 
+For terminal-based workflows, [Remote Sessions with AHP](remote-sessions-with-ahp/) explains how to share and attach to Copilot CLI sessions across terminals, Codespaces, and cloud environments using the Agent Host Protocol.
+
 ## Reference
 
 Quick-lookup resources to keep handy while you work. Browse the

@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
+lastUpdated: 2026-08-13
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -470,6 +470,12 @@ The settings dialog supports search — type to filter settings by name. Changes
 
 These flags mirror the **Repo** and **Repo (local)** scope tabs available in the `/settings` dashboard (v1.0.71+), making it easier to manage per-repository vs. user-global configuration without ambiguity. In v1.0.71+, the `/settings` dashboard also shows **Repo** and **Repo (local)** tabs alongside the existing user-level view, giving you a unified place to see which settings are applied at each layer.
 
+> **Session-scoped `/model` (v1.0.79+)**: `/model` is now **session-scoped by default** — changing the model applies to the current session only, without modifying saved settings. To set a persistent model default for future sessions, use `/config model` instead:
+> ```
+> /model claude-sonnet    # switch model for this session only
+> /config model           # set a default model for future sessions
+> ```
+
 GitHub Copilot CLI has two commands for managing session state, with distinct behaviours:
 
 | Command | Behaviour |
@@ -556,6 +562,15 @@ In v1.0.66+, you can pass a task description to `/worktree` to name the branch f
 This creates a branch named from your task description and begins working on it immediately, making it easy to spin up parallel work without stopping to think of a branch name.
 
 After the command runs, the session is inside the new worktree. Use this when you want to work on a second task in parallel without stashing changes or opening a new terminal. In v1.0.64+ you can also use the experimental `--worktree` flag at startup (`copilot -w [name]`) to create or reuse a worktree under `<repo>.worktrees/` before the session begins.
+
+**`/worktree new`** *(v1.0.79+)*: Creates a new git worktree **and** starts a fresh session inside it, without carrying over uncommitted changes from the current session. This is useful when you want to start a completely independent work track from HEAD:
+
+```
+/worktree new             # create a new worktree and start a fresh session in it
+copilot --worktree new    # equivalent startup flag
+```
+
+The `worktreeBaseRef` setting *(v1.0.79+)* controls whether `/worktree`, `/worktree new`, and `--worktree` start from HEAD or the remote default branch. All three default to HEAD; set `worktreeBaseRef` to `"remote"` to branch from the remote default branch instead.
 
 The `/every` command (also available as `/loop` since v1.0.64) schedules a recurring prompt to run automatically at a specified interval. The companion `/after` command runs a prompt once after a specified delay. Both are useful for self-paced automation — polling for results, periodically summarizing progress, or triggering other slash commands on a timer:
 
@@ -717,6 +732,14 @@ Use `/autopilot` when you want to flip between supervised and unsupervised opera
 
 > **Read-only `gh` CLI commands (v1.0.46+)**: Read-only `gh` commands — such as `gh issue list`, `gh pr view`, `gh run status`, and other commands that don't write to GitHub — are **automatically approved** without a permission prompt. Only commands that write to GitHub (like creating issues, merging PRs) still require explicit approval. This reduces friction during exploratory sessions where you frequently check issue or PR status.
 
+The `/permissions` command *(v1.0.78+)* provides a quick way to switch between approval modes mid-session without using the full `/allow-all` syntax:
+
+```
+/permissions     # open the permissions mode picker
+```
+
+Use this when you want to change how the agent handles tool permission prompts — for example, switching from the default interactive approval to auto allow-all or back to fully supervised mode — without leaving the current session.
+
 The `--effort` flag (shorthand for `--reasoning-effort`) controls how much computational reasoning the model applies to a request:
 
 ```bash
@@ -743,6 +766,14 @@ copilot --plan          # start in plan mode (propose without executing)
 ```
 
 This is useful in scripts or CI pipelines where you want the CLI to immediately begin working in a specific mode without an interactive prompt.
+
+*(v1.0.79+)* You can **combine `--plan` with `--mode autopilot`** to first produce a plan, then immediately implement it without waiting for manual approval:
+
+```bash
+copilot --plan --mode autopilot "Refactor the authentication module"
+```
+
+The agent generates a structured plan first, then switches to autopilot and executes it end-to-end. This gives you the structured-thinking benefit of plan mode while still running autonomously.
 
 The `--max-autopilot-continues` flag controls how many times Copilot can automatically continue in autopilot mode before pausing for confirmation. The default is 5:
 

@@ -3,7 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
+lastUpdated: 2026-08-13
 estimatedReadingTime: '8 minutes'
 tags:
   - plugins
@@ -46,16 +46,21 @@ my-plugin/
 ├── .github/
 │   └── plugin/
 │       └── plugin.json        # Plugin manifest (name, description, version)
-├── agents/
-│   ├── api-architect.agent.md
-│   └── test-specialist.agent.md
+├── com.github.copilot/
+│   ├── agents/
+│   │   ├── api-architect.agent.md
+│   │   └── test-specialist.agent.md
+│   ├── hooks/
+│   │   └── hooks.json
+│   └── extensions/
 ├── skills/
 │   └── database-migrations/
 │       ├── SKILL.md
 │       └── scripts/migrate.sh
-├── hooks.json
 └── README.md
 ```
+
+> **Breaking change (v1.0.80)**: Agent Plugins spec plugins now load `agents/`, `commands/`, `rules/`, `hooks/hooks.json`, `lsp.json`, and `extensions/` **only** from the `com.github.copilot/` subdirectory — no longer from the plugin root. If you maintain a plugin that places these components at the root level, move them into `com.github.copilot/` to keep them discoverable. Skills defined in the `plugin.json` `skills` field are unaffected by this change.
 
 The `plugin.json` manifest declares what the plugin contains:
 
@@ -278,7 +283,7 @@ See [Using the Copilot Coding Agent](../using-copilot-coding-agent/) for details
 
 - **Start with a marketplace plugin** before building your own — there may already be one that fits your needs
 - **Keep plugins focused** — a plugin for "Rails development" is better than a plugin for "everything"
-- **Check for updates regularly** — run `copilot plugin update` to get the latest improvements
+- **Check for updates regularly** — run `copilot plugin update` to get the latest improvements; first-party plugins (from the `copilot-plugins` marketplace) update automatically at session start as of v1.0.78
 - **Review what you install** — plugins run code on your machine, so inspect unfamiliar plugins before installing
 - **Use plugins for team standards** — publish an internal plugin to ensure every team member has the same agents, skills, and hooks
 - **Remove unused plugins** — declutter with `copilot plugin uninstall` to keep your environment clean
