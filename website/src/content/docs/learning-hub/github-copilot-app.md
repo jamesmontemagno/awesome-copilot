@@ -3,7 +3,7 @@ title: 'Getting Started with the GitHub Copilot app'
 description: 'Learn about the GitHub Copilot app, a desktop experience built for agent-native development. Understand its key features and who it''s for.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-06-17
+lastUpdated: 2026-08-14
 estimatedReadingTime: '8 minutes'
 tags:
   - copilot-app
@@ -66,6 +66,18 @@ Each session the Copilot app creates runs in its own **git worktree**—a real, 
 - You can pick up a session from any device, on any worktree
 
 This makes it easy to dispatch multiple agents and trust they won't interfere with each other.
+
+#### Controlling the Worktree Start Point
+
+By default, new worktrees start from HEAD (your current branch tip). You can change this with the `worktreeBaseRef` setting in your user `settings.json`:
+
+```json
+{
+  "worktreeBaseRef": "origin/main"
+}
+```
+
+Setting `worktreeBaseRef` to a remote ref (e.g., `"origin/main"`) means every new worktree starts from the remote default branch, regardless of which branch you are on. This is useful when you always want sessions to branch from a clean, up-to-date baseline.
 
 ### Canvases
 
@@ -145,6 +157,16 @@ Once installed, you can create a session by:
 3. **From your inbox**: The app syncs your GitHub inbox—click an issue and start a session for it
 
 Each session runs in its own worktree with its own isolated environment. You can run multiple sessions in parallel.
+
+### Opening the App from Copilot CLI
+
+If you're already working in the Copilot CLI terminal and want to pick up that session in the GitHub Copilot desktop app, use the `/app` command:
+
+```
+/app
+```
+
+This opens the current CLI session directly in the Copilot app, with the same context and working directory — no need to navigate to it manually. Requires **GitHub Copilot app 1.1.3 or later**.
 
 ### Launching Sessions from the Terminal with Deep Links
 
