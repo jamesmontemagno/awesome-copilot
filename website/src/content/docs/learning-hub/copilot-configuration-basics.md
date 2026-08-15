@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
+lastUpdated: 2026-08-15
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -429,6 +429,8 @@ CLI settings use **camelCase** naming. Key settings added in recent releases:
 | `proxy` | HTTP(S) proxy URL for all outbound CLI requests (e.g., `http://proxy.example.com:8080`) (v1.0.64+) |
 | `sessionLimits` | Restrict credit or turn usage for a session; limits apply across the current conversation and reset on `/clear` (v1.0.66+) |
 | `stayInAutopilot` | Keep the CLI in autopilot mode after an autopilot task completes, instead of returning to interactive mode (v1.0.69+) |
+| `pinnedPrompts` | Show the current prompt pinned above the timeline. Off by default — set to `true` to enable. On terminals under 30 rows, pinning is automatically suppressed unless you set this explicitly (v1.0.79+) |
+| `worktreeBaseRef` | Controls whether `/worktree`, `/worktree new`, and `--worktree` start from `HEAD` or the remote default branch. Defaults to `"head"` (v1.0.79+) |
 
 > **Note**: Older snake_case names (e.g., `include_gitignored`, `auto_updates_channel`) are still accepted for backward compatibility, but camelCase is now the preferred format.
 
@@ -448,6 +450,17 @@ The model picker opens in a **full-screen view** with inline reasoning effort ad
 **Auto mode and server-side model routing** (v1.0.43+): When you select **Auto** as your model, the CLI uses server-side model routing for real-time model selection. Instead of locking in a single model at session start, Auto mode evaluates each request and routes it to the most appropriate model dynamically. This means straightforward questions can be handled by a faster model while complex reasoning tasks are automatically escalated — without you needing to switch models manually.
 
 **Model family aliases** (v1.0.64+): Instead of typing a full model name, you can use short family aliases in the model setting: `opus`, `sonnet`, `haiku` (Anthropic), and `gpt`, `gemini` (Google/OpenAI). The CLI resolves the alias to the latest available model in that family. This is especially useful in scripts or configuration files where you want to track the best model in a family without hardcoding a version string.
+
+**Session-scoped model changes** (v1.0.79+): The `/model` command is now **session-scoped by default** — switching models only affects the current session and does not persist after it ends. To set a model as the default for all future sessions, use `/config model` instead:
+
+```
+/model claude-sonnet-4-5       # switch model for this session only
+/config model claude-sonnet-4-5  # set as default for all future sessions
+```
+
+This applies to the model picker as well — any model you select mid-session applies to that session only. Use `/config model` (or `--model` at startup) to persist a preference.
+
+**Model picker grouping** (v1.0.79+): The model picker now groups models into **Recent**, **Recommended**, **New**, and other sections. Press **Shift+Tab** to switch between grouping views, making it easier to discover newly added models. Newly supported models in v1.0.79 include **kimi-k3**.
 
 ### CLI Session Commands
 
@@ -507,6 +520,8 @@ You can also press **x** on a highlighted session in the session picker (`--resu
 
 In the session picker, press **`s`** to cycle the sort order: relevance, last used, created, or name. The picker also shows the branch name and idle/in-use status for each session.
 
+*(v1.0.79+)* The **Sessions sidebar** lets you manage multiple concurrent sessions from a persistent side panel — switch between active sessions, spawn new ones, and see each session's status at a glance. Access it from the **Sessions tab** in the sidebar or via the split-view sidebar controls. This makes it easier to run parallel workstreams without losing track of what each session is doing.
+
 The `/rewind` command opens a timeline picker that lets you roll back the conversation to any earlier point in history, reverting both the conversation and any file changes made after that point. You can also trigger it by pressing **double-Esc**:
 
 ```
@@ -556,6 +571,21 @@ In v1.0.66+, you can pass a task description to `/worktree` to name the branch f
 This creates a branch named from your task description and begins working on it immediately, making it easy to spin up parallel work without stopping to think of a branch name.
 
 After the command runs, the session is inside the new worktree. Use this when you want to work on a second task in parallel without stashing changes or opening a new terminal. In v1.0.64+ you can also use the experimental `--worktree` flag at startup (`copilot -w [name]`) to create or reuse a worktree under `<repo>.worktrees/` before the session begins.
+
+*(v1.0.79+)* Use `/worktree new` to **start a brand-new session in a new worktree** — it creates the worktree and immediately opens a fresh conversation inside it, leaving the current session untouched:
+
+```
+/worktree new              # start a new session in a new worktree
+/worktree new fix the auth bug   # name the branch from a task description
+```
+
+The `worktreeBaseRef` setting (v1.0.79+) controls whether `/worktree`, `/worktree new`, and `--worktree` start from `HEAD` or the remote default branch. All three now default to `HEAD`. To change this to always start from the remote default branch, set `worktreeBaseRef` in your user settings:
+
+```json
+{
+  "worktreeBaseRef": "remote"
+}
+```
 
 The `/every` command (also available as `/loop` since v1.0.64) schedules a recurring prompt to run automatically at a specified interval. The companion `/after` command runs a prompt once after a specified delay. Both are useful for self-paced automation — polling for results, periodically summarizing progress, or triggering other slash commands on a timer:
 
@@ -744,6 +774,14 @@ copilot --plan          # start in plan mode (propose without executing)
 
 This is useful in scripts or CI pipelines where you want the CLI to immediately begin working in a specific mode without an interactive prompt.
 
+*(v1.0.79+)* You can now combine `--plan` with `--mode autopilot` to **plan first and then implement automatically** — the CLI enters plan mode, proposes a plan, and then transitions to autopilot to execute it without waiting for interactive approval at each step:
+
+```bash
+copilot --plan --mode autopilot "Refactor the authentication module"
+```
+
+This is useful for longer tasks where you want the agent to think through its approach first and then execute autonomously.
+
 The `--max-autopilot-continues` flag controls how many times Copilot can automatically continue in autopilot mode before pausing for confirmation. The default is 5:
 
 ```bash
@@ -760,6 +798,16 @@ copilot --no-sandbox -p "Set up development environment with system tools"
 ```
 
 These flags apply only to the current invocation — your persisted sandbox preference remains unchanged.
+
+*(v1.0.79+)* The **`/sandbox policy`** command shows the effective sandbox paths, active denials, and network access settings for the current session — useful for debugging when a sandboxed command is blocked unexpectedly:
+
+```
+/sandbox policy
+```
+
+The `/sandbox` dialog now includes an **Auth tab** that groups git, `gh`, and (on macOS) keychain settings. The underlying settings keys have moved as part of this reorganization: `sandbox.gitAuth` → `sandbox.auth.git` and `sandbox.ghAuth` → `sandbox.auth.gh`. If you have these configured in your `settings.json`, rename them accordingly — the old keys are no longer read.
+
+> **Breaking change (v1.0.79)**: The `allowDevToolCaches` sandbox setting is **renamed to `allowDevToolAccess`**. The old key is silently ignored, so an existing `false` opt-out reverts to the default (on). Rename it in your `settings.json` and in any MDM/managed policy files.
 
 The `--attachment` flag (available in prompt mode, `-p`) lets you attach files — images or native documents — to the initial prompt in non-interactive mode:
 
