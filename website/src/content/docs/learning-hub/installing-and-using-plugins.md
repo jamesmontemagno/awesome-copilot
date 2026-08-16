@@ -3,7 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
+lastUpdated: 2026-08-16
 estimatedReadingTime: '8 minutes'
 tags:
   - plugins
@@ -73,6 +73,8 @@ The `plugin.json` manifest declares what the plugin contains:
   ]
 }
 ```
+
+*(v1.0.74+)* GitHub Copilot CLI also supports **Open Plugin Spec v1** manifests, which use a standardized format and can include an `mcp.json` configuration file for MCP server definitions. This improves interoperability with other tools that implement the same spec.
 
 ## Why Use Plugins?
 
@@ -182,6 +184,24 @@ Pinning to a SHA guarantees that everyone on the team installs plugins from exac
 - **Change control** — review and approve plugin updates before rolling them out team-wide
 - **Stability** — prevent breaking changes in upstream marketplaces from impacting your team without notice
 
+### Auto-updating Marketplace Plugins
+
+*(v1.0.79+)* You can set `"autoUpdate": true` on any `extraKnownMarketplaces` entry in your user settings to automatically update its plugins to the latest version at session start — no manual `copilot plugin update` required:
+
+```json
+{
+  "extraKnownMarketplaces": [
+    {
+      "name": "my-org-plugins",
+      "source": "my-org/internal-plugins",
+      "autoUpdate": true
+    }
+  ]
+}
+```
+
+First-party plugins (those in the built-in `copilot-plugins` marketplace) are already updated automatically at each session start as of v1.0.78.
+
 ## Installing Plugins
 
 ### From Copilot CLI
@@ -220,6 +240,19 @@ copilot plugin marketplace update
 
 # Remove a plugin
 copilot plugin uninstall my-plugin
+```
+
+*(v1.0.76+)* The `/plugins` command now includes **enable/disable controls** so you can toggle individual plugins, instructions, agents, LSP servers, and hooks without uninstalling them. This is useful for temporarily disabling a plugin to debug a conflict or test without it:
+
+```
+/plugins            # open the plugins manager
+```
+
+Within the `/plugins` dialog, select any installed plugin and toggle it on or off. The change takes effect immediately in the current session. You can also use the `enable` and `disable` subcommands with `--plugin`, `--mcp`, or `--skill` flags:
+
+```
+/plugins disable --plugin my-plugin
+/plugins enable --plugin my-plugin
 ```
 
 ### Loading Plugins from a Local Directory

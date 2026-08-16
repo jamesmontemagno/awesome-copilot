@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
+lastUpdated: 2026-08-16
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -191,6 +191,8 @@ my-monorepo/
 ```
 
 When you work inside `packages/api/`, Copilot loads configuration from `packages/api/.github/`, then `packages/.github/` (if it exists), then the root `.github/`. This layered discovery ensures the right context is active no matter where in the repository you're working.
+
+**Faster search in large monorepos** (v1.0.79+): GitHub Copilot CLI now uses [**tgrep**](https://github.com/microsoft/tgrep) — a trigram-indexed grep — instead of ripgrep for code search in large codebases. This makes searching significantly faster in monorepos with many files, with no configuration required.
 
 ### Personal Skills Directory
 
@@ -445,9 +447,28 @@ These files follow the same format as `config.json` and are loaded after the glo
 
 The model picker opens in a **full-screen view** with inline reasoning effort adjustment. Use the **← / →** arrow keys to change the reasoning effort level (`low`, `medium`, `high`) directly from the picker without leaving the session. The current reasoning effort level is also displayed in the model header (e.g., `claude-sonnet-4.6 (high)`) so you always know which level is active.
 
+**Model picker grouping** (v1.0.79+): The model picker now organizes models into sections — **Recent**, **Recommended**, **New**, and others — so it's easier to find what you need at a glance. Use **Shift+Tab** to switch between grouping views.
+
 **Auto mode and server-side model routing** (v1.0.43+): When you select **Auto** as your model, the CLI uses server-side model routing for real-time model selection. Instead of locking in a single model at session start, Auto mode evaluates each request and routes it to the most appropriate model dynamically. This means straightforward questions can be handled by a faster model while complex reasoning tasks are automatically escalated — without you needing to switch models manually.
 
 **Model family aliases** (v1.0.64+): Instead of typing a full model name, you can use short family aliases in the model setting: `opus`, `sonnet`, `haiku` (Anthropic), and `gpt`, `gemini` (Google/OpenAI). The CLI resolves the alias to the latest available model in that family. This is especially useful in scripts or configuration files where you want to track the best model in a family without hardcoding a version string.
+
+**Session-scoped model selection** (v1.0.79+): `/model` is now **session-scoped by default** — the model you pick applies only to the current session and does not change your saved default. To set a persistent default for future sessions, use `/config model` instead:
+
+```
+/model claude-sonnet-4.6     # applies to this session only
+/config model claude-sonnet-4.6  # sets the default for all future sessions
+```
+
+**Plan-mode model** (v1.0.74+): Use `/model plan` (or `/model --plan`) to select a dedicated model for plan mode. The plan-mode model is used while in `/plan` and reverts to the session model when you exit plan mode. Pass a model ID, `off` to clear it, or no argument to open the picker.
+
+**Combining plan and autopilot** (v1.0.79+): You can now combine `--plan` with `--mode autopilot` at startup to plan first and then implement without waiting for manual approval:
+
+```bash
+copilot --plan --mode autopilot "Implement the rate-limiting feature"
+```
+
+This is useful in CI pipelines where you want Copilot to produce a plan and then execute it end-to-end without interactive confirmation.
 
 ### CLI Session Commands
 
@@ -513,6 +534,11 @@ The `/rewind` command opens a timeline picker that lets you roll back the conver
 /rewind
 ```
 
+*(v1.0.78+)* `/rewind` no longer requires git — it works in any session regardless of whether the current directory is a git repository. When reverting, you can choose between:
+
+- **Conversation only** — resets the transcript without touching any files
+- **Conversation + files** — resets the transcript and reverts file changes Copilot made after that point (skips files whose contents no longer match what Copilot last wrote)
+
 Use `/rewind` when you want to branch off from a different point in the conversation, rather than just undoing the most recent turn.
 
 The `/undo` command reverts the last turn—including any file changes the agent made—letting you course-correct without manually undoing edits:
@@ -554,6 +580,20 @@ In v1.0.66+, you can pass a task description to `/worktree` to name the branch f
 ```
 
 This creates a branch named from your task description and begins working on it immediately, making it easy to spin up parallel work without stopping to think of a branch name.
+
+*(v1.0.79+)* Use **`/worktree new`** to open a fresh session in a brand-new worktree without a kickoff task:
+
+```
+/worktree new
+```
+
+**`worktreeBaseRef` setting** (v1.0.79+): By default, `/worktree`, `/worktree new`, and `--worktree` all start from **HEAD**. Set `worktreeBaseRef` in your config to `"remote"` if you prefer worktrees to start from the remote default branch instead:
+
+```json
+{
+  "worktreeBaseRef": "remote"
+}
+```
 
 After the command runs, the session is inside the new worktree. Use this when you want to work on a second task in parallel without stashing changes or opening a new terminal. In v1.0.64+ you can also use the experimental `--worktree` flag at startup (`copilot -w [name]`) to create or reuse a worktree under `<repo>.worktrees/` before the session begins.
 
@@ -717,6 +757,22 @@ Use `/autopilot` when you want to flip between supervised and unsupervised opera
 
 > **Read-only `gh` CLI commands (v1.0.46+)**: Read-only `gh` commands — such as `gh issue list`, `gh pr view`, `gh run status`, and other commands that don't write to GitHub — are **automatically approved** without a permission prompt. Only commands that write to GitHub (like creating issues, merging PRs) still require explicit approval. This reduces friction during exploratory sessions where you frequently check issue or PR status.
 
+The `/permissions` command *(v1.0.78+)* provides a unified way to switch between the different approval modes mid-session, replacing the need to remember the separate `/allow-all` and `/autopilot` commands:
+
+```
+/permissions        # open the permissions picker
+```
+
+Use `/permissions` when you want to review or change approval behavior without hunting through multiple commands.
+
+The `/limits predict` command *(v1.0.76+)* suggests an appropriate AI-credit session limit by analysing similar past sessions. This makes it easier to set `sessionLimits` without guessing:
+
+```
+/limits predict
+```
+
+The suggestion is based on the complexity and type of work in your current session and comparable completed sessions.
+
 The `--effort` flag (shorthand for `--reasoning-effort`) controls how much computational reasoning the model applies to a request:
 
 ```bash
@@ -760,6 +816,14 @@ copilot --no-sandbox -p "Set up development environment with system tools"
 ```
 
 These flags apply only to the current invocation — your persisted sandbox preference remains unchanged.
+
+**Sandbox inspection** (v1.0.79+): Use `/sandbox policy` to view all effective sandbox paths, active denials, and current network-access settings in one place — useful when troubleshooting why a sandboxed command is being blocked:
+
+```
+/sandbox policy
+```
+
+> **Breaking change (v1.0.79)**: The sandbox setting `allowDevToolCaches` has been **renamed to `allowDevToolAccess`**. The old key is no longer read and is silently ignored, so any existing `false` opt-out reverts to the default (on). Rename the setting in your `settings.json` and in any MDM/managed-policy files.
 
 The `--attachment` flag (available in prompt mode, `-p`) lets you attach files — images or native documents — to the initial prompt in non-interactive mode:
 
