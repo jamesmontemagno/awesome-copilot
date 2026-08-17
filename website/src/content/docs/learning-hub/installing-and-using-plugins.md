@@ -3,7 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
+lastUpdated: 2026-08-17
 estimatedReadingTime: '8 minutes'
 tags:
   - plugins
@@ -33,7 +33,7 @@ A plugin bundles one or more of the following components:
 | **Hooks** | Event handlers that intercept agent behavior | `hooks.json` or `hooks/` |
 | **MCP Servers** | Model Context Protocol integrations for external tools | `.mcp.json` or `.github/mcp.json` |
 | **LSP Servers** | Language Server Protocol integrations | `lsp.json` or `.github/lsp.json` |
-| **Extensions** | IDE extensions installable via the plugin marketplace (v1.0.62+) | `extensions/` |
+| **Extensions** | IDE extensions installable via the plugin marketplace (v1.0.62+); CLI plugins can also ship extensions under `com.github.copilot/extensions/` (v1.0.79+) | `extensions/` |
 
 A plugin might include all of these or just one — for example, a plugin could provide a single specialized agent, or an entire development toolkit with multiple agents, skills, hooks, and MCP server configurations working together.
 
@@ -160,6 +160,24 @@ To automatically register an additional marketplace for everyone working in a re
 
 With this in place, team members automatically get the `my-org-plugins` marketplace available without running a separate `marketplace add` command. This replaces the older `marketplaces` setting, which was removed in v1.0.16.
 
+### Auto-Updating Marketplace Plugins
+
+*(v1.0.79+)* Set `autoUpdate: true` on an `extraKnownMarketplaces` entry to automatically update its plugins to the latest version at each session start:
+
+```json
+{
+  "extraKnownMarketplaces": [
+    {
+      "name": "my-org-plugins",
+      "source": "my-org/internal-plugins",
+      "autoUpdate": true
+    }
+  ]
+}
+```
+
+First-party plugins (from the built-in `copilot-plugins` marketplace) always auto-update to the latest version at session start. This setting extends the same behavior to your additional marketplaces.
+
 ### Pinning a Marketplace to a Specific Commit
 
 *(v1.0.70+)* To ensure reproducibility and prevent unintended updates, you can pin a marketplace to an exact commit SHA using the `sha` field in the source configuration:
@@ -221,6 +239,27 @@ copilot plugin marketplace update
 # Remove a plugin
 copilot plugin uninstall my-plugin
 ```
+
+### Enabling and Disabling Plugins
+
+*(v1.0.76+)* You can enable or disable individual plugins — and their contained components (agents, instructions, LSP servers, hooks) — without uninstalling them. Use the `/plugins` command inside an interactive session:
+
+```
+/plugins                          # open the plugins management panel
+/plugins enable my-plugin         # re-enable a disabled plugin
+/plugins disable my-plugin        # disable without removing
+
+# You can also target specific components via flags:
+/plugins disable my-plugin --agent api-architect
+/plugins disable my-plugin --skill database-migrations
+/plugins disable my-plugin --mcp postgres
+```
+
+Disabling a plugin (or a component within it) is useful when you want to temporarily stop loading certain agents or hooks without losing the plugin configuration.
+
+### Open Plugin Spec v1 Compatibility
+
+*(v1.0.74+)* Copilot CLI supports **Open Plugin Spec v1** plugin manifests and `mcp.json` configuration. Third-party plugins authored to the Open Plugin Spec standard install and run alongside native Copilot plugins, giving you access to a broader ecosystem of community and enterprise tooling.
 
 ### Loading Plugins from a Local Directory
 

@@ -3,7 +3,7 @@ title: 'Using the Copilot Coding Agent'
 description: 'Learn how to use GitHub Copilot coding agent to autonomously work on issues, generate pull requests, and automate development tasks.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-05-13
+lastUpdated: 2026-08-17
 estimatedReadingTime: '12 minutes'
 tags:
   - coding-agent
@@ -132,7 +132,20 @@ Or provide more specific direction:
 Use the existing FileUpload component and S3 service.
 ```
 
-### Using Custom Agents
+### Combining Plan Mode with Autopilot
+
+*(v1.0.79+)* You can combine `--plan` with `--mode autopilot` to have the agent first plan its approach and then implement automatically without pausing for approval at each step:
+
+```bash
+copilot --plan --mode autopilot "implement the rate limiter described in issue #42"
+```
+
+In this mode, the agent:
+1. Reads the task and produces a plan
+2. Immediately begins executing the plan in autopilot — no per-step approval needed
+3. Opens a PR when done
+
+This is useful when you trust the task scope and want a fully hands-off session. Use it with well-scoped issues and a solid `copilot-setup-steps.yml` so the agent can validate its own work.
 
 Custom agents let you give the coding agent a specialized persona, toolset, and instructions for specific types of work. Instead of relying on generic behavior, you can point the coding agent at an agent profile tailored for your task.
 
@@ -377,6 +390,59 @@ Since v1.0.47, `--resume` also surfaces **cloud agent sessions that haven't yet 
 
 > **Note**: Remote control replaces the earlier "steering" feature. If you see references to steering in older documentation, remote control is the updated equivalent.
 
+## Managing Multiple Concurrent Sessions
+
+*(v1.0.76+)* Copilot CLI includes a **Sessions sidebar** for managing multiple concurrent agent sessions without switching between terminal windows. Enable it with:
+
+```
+/experimental on
+```
+
+Once enabled, a sidebar appears showing all active sessions with their current status. You can:
+
+- Switch between sessions by selecting them in the sidebar
+- Spawn new sessions from the sidebar
+- See at a glance which sessions are running, waiting for input, or blocked
+
+The **Sessions tab** (available in v1.0.79+) provides the same view without requiring experimental mode.
+
+### Queuing Work Across Sessions
+
+*(v1.0.76+)* You can queue prompts, shell commands, and supported slash commands to run in order after the current task finishes — useful for staging follow-up work without interrupting what's in progress:
+
+```
+/queue fix the flaky login test
+```
+
+A **queue manager** lets you reorder, edit, remove, and repeat queued messages before they execute. The queue appears in the footer showing how many messages are pending.
+
+## Working with Worktrees
+
+Worktrees let you run multiple coding agent sessions in parallel, each in its own isolated branch and directory — without one session interfering with another.
+
+### Creating a New Worktree Session
+
+*(v1.0.78+)* Use `/worktree new` to start a fresh session in a brand-new worktree:
+
+```
+/worktree new           # create a new worktree and start a conversation in it
+/worktree new fix/auth  # create a worktree on a specific branch
+```
+
+The new worktree gets its own branch, its own directory, and its own isolated environment. You can run `/worktree new` from any existing session and switch between sessions via the Sessions sidebar.
+
+### Configuring the Worktree Starting Point
+
+*(v1.0.79+)* By default, `/worktree`, `/worktree new`, and `--worktree` all start from **HEAD** (the current commit on your branch). To instead start from the remote default branch, set `worktreeBaseRef` in your user settings:
+
+```json
+{
+  "worktreeBaseRef": "origin/main"
+}
+```
+
+This is useful when you always want new worktrees to branch off the latest main, regardless of where you currently are.
+
 ## Hooks and the Coding Agent
 
 Hooks are especially valuable with the coding agent because they provide deterministic guardrails for autonomous work:
@@ -451,6 +517,7 @@ A: Yes. You can specify which agent to use when assigning work — the coding ag
 - **Add Guardrails**: [Automating with Hooks](../automating-with-hooks/) — Ensure code quality in autonomous sessions
 - **Build Custom Agents**: [Building Custom Agents](../building-custom-agents/) — Create specialized agents for the coding agent to use
 - **Explore Configuration**: [Copilot Configuration Basics](../copilot-configuration-basics/) — Set up repository-level customizations
+- **Install Plugins**: [Installing and Using Plugins](../installing-and-using-plugins/) — Bundle agents, skills, and hooks into shareable packages
 - **Browse Community Resources**: Explore the [Agents](../../agents/), [Skills](../../skills/), and [Plugins](../../plugins/) directories for ready-to-use resources
 
 ---
