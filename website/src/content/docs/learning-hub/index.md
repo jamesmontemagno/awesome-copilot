@@ -23,6 +23,8 @@ Essential concepts to tailor GitHub Copilot beyond its default experience. Start
 and work through the full track to master every customization primitive. For delegation
 and orchestration patterns, continue with [Agents and Subagents](agents-and-subagents/).
 
+**Collaborative Sessions**: Learn how to share and persist Copilot sessions across terminals and machines with [Collaborative Sessions with Agent Host Protocol (AHP)](collaborative-sessions-with-ahp/).
+
 ## Reference
 
 Quick-lookup resources to keep handy while you work. Browse the

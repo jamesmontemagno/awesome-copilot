@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
+lastUpdated: 2026-08-18
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -711,6 +711,12 @@ The `/autopilot` command (v1.0.45+) is a quick in-session toggle that switches b
 
 Use `/autopilot` when you want to flip between supervised and unsupervised operation mid-session without typing out the full `/allow-all on` or `/allow-all off` commands.
 
+> **Explicit objectives (v1.0.80+)**: You can now pass an objective directly to `/autopilot` without enabling experimental mode:
+> ```
+> /autopilot Refactor all API handlers to use async/await
+> ```
+> This sets a persistent goal that the agent works toward in autopilot mode. Use `/goal` to review or update the current objective mid-session.
+
 > **Enhanced autopilot (v1.0.64+)**: When autopilot mode is active — including when launched with `--autopilot` at startup or during automatic continuation turns — the agent automatically handles elicitation dialogs, `ask_user` prompts, sampling requests, and permission prompts without surfacing them as interactive dialogs. This means long-running automated sessions can proceed end-to-end without manual confirmation steps.
 
 > **Auto allow-all mode (v1.0.69+)**: In addition to the standard allow-all mode (which approves everything), the CLI now supports an **auto allow-all** mode that uses an LLM judge to evaluate each tool request. When enabled, the judge automatically approves requests it evaluates as acceptable, and asks you for manual confirmation only for requests it considers risky. This gives you a middle ground between full autopilot and fully supervised operation — most routine actions proceed automatically while unusual or potentially dangerous actions still surface for your review. As of v1.0.69-3, this mode requires experimental features to be enabled — use `/experimental on` or start the CLI with `--experimental` — then activate it with `/allow-all auto`. The previous `AUTO_APPROVAL` environment variable approach has been removed in favour of experimental mode.
@@ -760,6 +766,22 @@ copilot --no-sandbox -p "Set up development environment with system tools"
 ```
 
 These flags apply only to the current invocation — your persisted sandbox preference remains unchanged.
+
+The `--usage-output-file` flag *(v1.0.80+)* writes final usage metrics (token counts, model usage, and per-agent breakdowns) to a JSON file after the session ends:
+
+```bash
+copilot --autopilot --usage-output-file usage.json "Refactor the authentication module"
+```
+
+This is useful in automated pipelines and CI environments where you want to track token consumption or attribute costs to specific tasks. The file is written when the session exits.
+
+The `--enable-mcp-server` flag *(v1.0.80+)* re-enables specific MCP servers that have been disabled in settings for the current run, without permanently changing your saved configuration:
+
+```bash
+copilot --enable-mcp-server my-server -p "Query the database and generate a report"
+```
+
+Pass `--enable-mcp-server` multiple times to re-enable more than one server. This is useful when a server is disabled by default for security or performance but you need it for a specific task.
 
 The `--attachment` flag (available in prompt mode, `-p`) lets you attach files — images or native documents — to the initial prompt in non-interactive mode:
 

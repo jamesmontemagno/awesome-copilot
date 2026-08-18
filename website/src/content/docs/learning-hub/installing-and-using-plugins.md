@@ -3,7 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
+lastUpdated: 2026-08-18
 estimatedReadingTime: '8 minutes'
 tags:
   - plugins
@@ -73,6 +73,21 @@ The `plugin.json` manifest declares what the plugin contains:
   ]
 }
 ```
+
+> **Breaking change (v1.0.80+):** If you are using the **Agent Plugins spec** (also called "spec plugins"), component files are now read exclusively from a `com.github.copilot/` subdirectory inside the plugin root. The CLI no longer loads `commands/`, `agents/`, `rules/`, `hooks/hooks.json`, `lsp.json`, or `extensions/` from the plugin root directly. If your spec plugin has these files at the top level, move them into `com.github.copilot/`:
+>
+> ```
+> my-spec-plugin/
+> └── com.github.copilot/
+>     ├── agents/
+>     ├── commands/
+>     ├── hooks/
+>     │   └── hooks.json
+>     ├── lsp.json
+>     └── extensions/
+> ```
+>
+> This change does not affect **marketplace plugins** that declare their components in `plugin.json` — only spec-style plugins that previously relied on top-level directory placement.
 
 ## Why Use Plugins?
 
