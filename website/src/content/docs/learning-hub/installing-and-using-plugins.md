@@ -3,7 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
+lastUpdated: 2026-08-19
 estimatedReadingTime: '8 minutes'
 tags:
   - plugins
@@ -73,6 +73,8 @@ The `plugin.json` manifest declares what the plugin contains:
   ]
 }
 ```
+
+Plugins also support the **Open Plugin Spec v1** format, meaning a plugin can include an `mcp.json` configuration file to declare MCP server dependencies using the standard Open Plugin Spec schema. Copilot CLI discovers and loads these automatically alongside the classic `plugin.json` approach.
 
 ## Why Use Plugins?
 
@@ -222,6 +224,34 @@ copilot plugin marketplace update
 copilot plugin uninstall my-plugin
 ```
 
+You can also manage plugins from inside an interactive session using `/plugins`, which supports `enable`, `disable`, `update`, and `uninstall` as subcommands:
+
+```
+/plugins enable my-plugin
+/plugins disable my-plugin
+/plugins update my-plugin
+/plugins uninstall my-plugin
+```
+
+The `enable`/`disable` controls let you temporarily toggle a plugin's agents, skills, MCP servers, and hooks without uninstalling it — useful when you want to isolate a plugin for debugging or temporarily reduce context.
+
+### Auto-Updates for First-Party Plugins
+
+First-party plugins (those hosted in the official `copilot-plugins` marketplace) **update automatically to their latest version at session start**. You don't need to run `copilot plugin update` manually for these plugins. Community plugins from `awesome-copilot` and other third-party marketplaces still require a manual update command, unless you configure `autoUpdate: true` in your marketplace settings:
+
+```json
+// In your user settings.json
+{
+  "extraKnownMarketplaces": [
+    {
+      "name": "my-org",
+      "url": "https://github.com/my-org/plugins",
+      "autoUpdate": true
+    }
+  ]
+}
+```
+
 ### Loading Plugins from a Local Directory
 
 You can load plugins directly from a local directory without installing them from a marketplace, using the `--plugin-dir` flag when starting Copilot:
@@ -245,8 +275,11 @@ When you install a plugin, its components become available to Copilot CLI automa
 - **Skills** are loaded automatically when relevant to your current task
 - **Hooks** run at the configured lifecycle events during agent sessions
 - **MCP servers** extend the tools available to agents
+- **Extensions** (plugins that ship a `com.github.copilot/extensions/` directory) add IDE extension capabilities
 
 You don't need to do any additional configuration after installing — the plugin's components integrate seamlessly into your workflow. Plugins take effect immediately after installation without requiring a Copilot CLI restart.
+
+Plugin-contributed agents, skills, and MCP servers are also available in **non-interactive (`-p`) runs**, so `--agent <plugin>:<agent>` works headlessly without requiring a `--plugin-dir` override.
 
 ## Plugins from This Repository
 
