@@ -3,10 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-13
-estimatedReadingTime: '10 minutes'
-tags:
-  - configuration
+lastUpdated: 2026-08-20
   - setup
   - fundamentals
 relatedArticles:
@@ -449,6 +446,17 @@ The model picker opens in a **full-screen view** with inline reasoning effort ad
 
 **Model family aliases** (v1.0.64+): Instead of typing a full model name, you can use short family aliases in the model setting: `opus`, `sonnet`, `haiku` (Anthropic), and `gpt`, `gemini` (Google/OpenAI). The CLI resolves the alias to the latest available model in that family. This is especially useful in scripts or configuration files where you want to track the best model in a family without hardcoding a version string.
 
+**Model picker sections** (v1.0.79+): The model picker now groups models into **Recent**, **Recommended**, **New**, and other sections for easier discovery. Use **Shift+Tab** to cycle between grouping views.
+
+**Session-scoped `/model`** (v1.0.79+): `/model` is now session-scoped by default — selecting a model changes it only for the current session without affecting future ones. To set a persistent default model for all future sessions, use `/config model`:
+
+```
+/model claude-sonnet-5        # changes model for this session only
+/config model claude-sonnet-5 # sets default for all future sessions
+```
+
+This separation makes it easier to experiment with different models in a single session without accidentally changing your global default.
+
 ### CLI Session Commands
 
 The `/settings` command (v1.0.61+) opens an interactive dialog to browse and edit all user settings in one place. Use it to discover available settings, toggle options, and update values without manually editing your config file:
@@ -556,6 +564,21 @@ In v1.0.66+, you can pass a task description to `/worktree` to name the branch f
 This creates a branch named from your task description and begins working on it immediately, making it easy to spin up parallel work without stopping to think of a branch name.
 
 After the command runs, the session is inside the new worktree. Use this when you want to work on a second task in parallel without stashing changes or opening a new terminal. In v1.0.64+ you can also use the experimental `--worktree` flag at startup (`copilot -w [name]`) to create or reuse a worktree under `<repo>.worktrees/` before the session begins.
+
+*(v1.0.79+)* **`/worktree new`** starts a completely fresh session in a new worktree — branching off from the current state and opening a clean conversation in the new branch. This differs from `/worktree <task>` (which immediately runs a task) by giving you an empty session to work in:
+
+```
+/worktree new                  # new worktree, empty session
+/worktree new my-branch-name   # new worktree with a specific branch name
+```
+
+*(v1.0.79+)* The **`worktreeBaseRef`** setting controls what commit all three worktree creation paths (`/worktree`, `/worktree new`, and `--worktree`) branch from. The default is `HEAD` (your current commit). Set it to `origin/main` (or any remote ref) if you prefer new worktrees to always start from the remote default branch:
+
+```json
+{
+  "worktreeBaseRef": "origin/main"
+}
+```
 
 The `/every` command (also available as `/loop` since v1.0.64) schedules a recurring prompt to run automatically at a specified interval. The companion `/after` command runs a prompt once after a specified delay. Both are useful for self-paced automation — polling for results, periodically summarizing progress, or triggering other slash commands on a timer:
 
