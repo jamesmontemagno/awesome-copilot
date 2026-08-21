@@ -3,7 +3,7 @@ title: '01 · First Steps'
 description: 'Experience your first GitHub Copilot CLI demos and learn the three main interaction modes.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-06-19
+lastUpdated: 2026-08-21
 ---
 
 ![Chapter 01: First Steps](/images/learning-hub/copilot-cli-for-beginners/01/chapter-header.png)
@@ -316,11 +316,11 @@ Step 4: Test the flow
 Proceed with implementation? [Y/n]
 ```
 
-**Key insight**: Plan mode lets you review and modify the approach before any code is written. Once a plan is complete, you can even tell Copilot CLI to save it to a file for later reference. For example, "Save this plan to `mark_as_read_plan.md`" would create a markdown file with the plan details.
+**Key insight**: Plan mode lets you review and modify the approach before any code is written. While in plan mode, Copilot CLI is **read-only** and will not edit any files or run commands that change your workspace until you approve and move to implementation. This keeps you safely in the "thinking" stage until you're ready. Once a plan is complete, you can even tell Copilot CLI to save it to a file for later reference. For example, "Save this plan to `mark_as_read_plan.md`" would create a markdown file with the plan details.
 
 > 💡 **Want something more complex?** Try: `/plan Add search and filter capabilities to the book app`. Plan mode scales from simple features to full applications.
 
-> 📚 **Autopilot mode**: You may have noticed Shift+Tab cycles through a third mode called **Autopilot**. In autopilot mode, Copilot works through an entire plan without waiting for your input after each step — like handing a task to a colleague and saying "let me know when you're finished." The typical workflow is plan → accept → autopilot, which means you need to be good at writing plans first. Get comfortable with Interactive and Plan modes, then see the [official docs](https://docs.github.com/copilot/concepts/agents/copilot-cli/autopilot) when you're ready.
+> 📚 **Autopilot mode**: You may have noticed Shift+Tab cycles through a third mode called **Autopilot**. In autopilot mode, Copilot works through an entire plan without waiting for your input after each step — like handing a task to a colleague and saying "let me know when you're finished." The typical workflow is plan → accept → autopilot, which means you need to be good at writing plans first. You can also launch directly into autopilot with `copilot --autopilot`, or set a goal inline with `/autopilot <objective>` (for example, `/autopilot Add a search command to the book app`). You can also combine planning and autopilot by running `copilot --plan --mode autopilot`. Copilot will create a plan first and then implement it automatically without pausing for approval. Get comfortable with Interactive and Plan modes first, then see the [official docs](https://docs.github.com/copilot/concepts/agents/copilot-cli/autopilot) when you're ready.
 
 ---
 
@@ -365,16 +365,27 @@ copilot --allow-all -p "Review @myfile.py for issues"
 
 ## Essential Slash Commands
 
-These commands work in interactive mode. **Start with just these six** - they cover 90% of daily use:
+These commands are great to learn initially as you're getting started with Copilot CLI:
 
 | Command | What It Does | When to Use |
 |---------|--------------|-------------|
-| `/help` | Show all available commands | When you forget a command |
+| `/ask` | Ask a quick question without it affecting your conversation history | When you want a quick answer without derailing your current task |
 | `/clear` | Clear conversation and start fresh | When switching topics |
+| `/config` | View or set persistent defaults (e.g., default model) | When you want a setting to apply to all future sessions |
+| `/help` | Show all available commands | When you forget a command |
+| `/model` | Show or switch AI model for the current session | When you want to change the AI model |
 | `/plan` | Plan your work out before coding | For more complex features |
+| `/refine` | Rewrite a rough, stream-of-consciousness prompt into a clear, focused one | When your prompt feels messy and you want better results |
 | `/research` | Deep research using GitHub and web sources | When you need to investigate a topic before coding |
-| `/model` | Show or switch AI model | When you want to change the AI model |
 | `/exit` | End the session | When you're done |
+
+> 💡 **`/ask` vs regular chat**: Normally every message you send becomes part of the ongoing conversation and affects future responses. `/ask` is an "off the record" shortcut. It's perfect for quick one-off questions like `/ask What does YAML mean?` without polluting your session context.
+
+> 💡 **`/refine` for better prompts**: Not sure if your prompt is clear enough? Type it out as it comes to mind, then run `/refine` to let Copilot rewrite it into a precise, well-structured prompt before sending. This is especially useful when you're new to AI tools and still learning how to write effective prompts.
+
+> 💡 **Tab-completion**: When typing a slash command, press **Tab** to auto-complete the command name or cycle through available subcommands and arguments. This is especially handy when you can't remember the exact name of a command.
+
+> 💡 **Queue prompts while Copilot is busy**: If Copilot is in the middle of a task and you think of the next thing you want it to do, just type it and press **Enter**. Copilot will run it automatically when the current task finishes, so you don't have to wait around.
 
 That's it for getting started! As you become comfortable, you can explore additional commands.
 
@@ -401,7 +412,8 @@ That's it for getting started! As you become comfortable, you can explore additi
 
 | Command | What It Does |
 |---------|--------------|
-| `/model` | Show or switch AI model |
+| `/config` | View or set persistent defaults (e.g., `/config model` to set your default model for all future sessions) |
+| `/model` | Show or switch AI model for the current session only |
 | `/delegate` | Hand off task to Copilot coding agent on GitHub (agent in the cloud) |
 | `/fleet` | Split a complex task into parallel subtasks for faster completion |
 | `/tasks` | View background subagents and detached shell sessions |
@@ -439,6 +451,8 @@ That's it for getting started! As you become comfortable, you can explore additi
 | `/compact` | Summarize conversation to reduce context usage |
 | `/share` | Export session as markdown file or GitHub gist |
 
+> 💡 **Sessions tab**: The interactive Copilot CLI UI includes a **Sessions tab** at the top of the window. You can use it to view and switch between multiple sessions running at the same time. Press `n` in the Sessions tab to start a new session without closing the one you're in.
+
 ### Help and Feedback
 
 | Command | What It Does |
@@ -474,7 +488,15 @@ copilot
 # Shows available models and lets you pick one. Select Sonnet 4.5.
 ```
 
+> 💡 **Session vs. persistent model**: The `/model` command changes the model for the **current session only**. When you start a new session, Copilot will use the default again. To set a permanent default model for all future sessions, use `/config model` instead.
+
 > 💡 **Tip**: Some models cost more "premium requests" than others. Models marked **1x** (like Claude Sonnet 4.5) are a great default. They're capable and efficient. Higher-multiplier models use your premium request quota faster, so save those for when you really need them.
+
+> 💡 **Not sure which model to pick?** Select **`Auto`** from the model picker to let Copilot automatically choose the best available model for each session. This is a great default if you're just getting started and don't want to think about model selection.
+
+> 💡 **Model family shortcuts**: You can also type a short family alias — like `opus`, `sonnet`, `haiku`, `gpt`, or `gemini` — directly in the `/model` picker instead of scrolling through the full list. Copilot will pick the best available model in that family for you.
+
+> 💡 **Model picker navigation**: The model picker now groups models into sections — **Recent**, **Recommended**, and **New** — so you can quickly find the model you used last or try what's newly available. Use **Shift+Tab** inside the picker to switch between grouping views.
 
 </details>
 
