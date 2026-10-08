@@ -3,7 +3,7 @@ title: '01 · First Steps'
 description: 'Experience your first GitHub Copilot CLI demos and learn the three main interaction modes.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-07-17
+lastUpdated: 2026-10-02
 ---
 
 ![Chapter 01: First Steps](/images/learning-hub/copilot-cli-for-beginners/01/chapter-header.png)
@@ -456,6 +456,8 @@ That's it for getting started! As you become comfortable, you can explore additi
 | `/changelog` | Display changelog for CLI versions |
 | `/feedback` | Submit feedback to GitHub |
 | `/theme` | View or set terminal theme |
+| `/vim` | Enable or disable Vim mode for modal editing in the composer. Type naturally with vim keybindings like `hjkl` for navigation and `i`, `a`, `o` for insert mode |
+| `/voice` | Dictate your prompt using local speech-to-text — speak naturally instead of typing |
 
 ### Quick Shell Commands
 
