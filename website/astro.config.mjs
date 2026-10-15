@@ -119,6 +119,8 @@ export default defineConfig({
   integrations: [react(), sitemap(), pagefindResources()],
   redirects: {
     ...workshopRedirects,
+    "/learning-hub/copilot-workshops/first-steps/copilot-app/12-review/":
+      "/learning-hub/copilot-workshops/first-steps/copilot-app/13-review/",
     "/samples/": "/learning-hub/cookbook/",
     "/hooks/": "https://github.com/github/awesome-copilot/tree/main/hooks",
     "/workflows/": "https://github.com/github/awesome-copilot/tree/main/workflows",
